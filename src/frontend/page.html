@@ -1598,13 +1598,31 @@
         max-width: min(100%, 66ch);
         padding: 28px 18px 104px;
         font-size: 1rem;
-        line-height: 1.78;
+        line-height: 1.6;
       }
 
-      #doc h1,
-      #doc h2,
+      #doc > :where(h1, h2, h3, p, ul, ol, blockquote, hr) {
+        max-width: 100%;
+      }
+
+      #doc h1 {
+        font-size: 1.55rem;
+        margin-top: 1em;
+        margin-bottom: 0.3em;
+      }
+      #doc h2 {
+        font-size: 1.32rem;
+        margin-top: 1.4em;
+        margin-bottom: 0.3em;
+      }
       #doc h3 {
-        font-size: 1rem;
+        font-size: 1.18rem;
+        margin-top: 1.2em;
+        margin-bottom: 0.25em;
+      }
+
+      #doc li {
+        margin-bottom: 0.08em;
       }
 
       #doc pre {
@@ -1612,27 +1630,47 @@
         width: 100%;
         margin-left: 0;
         margin-right: 0;
-        overflow-x: hidden;
-        white-space: pre-wrap;
+        overflow-x: auto;
       }
 
       #doc pre code {
-        white-space: pre-wrap;
-        overflow-wrap: anywhere;
-        word-break: break-word;
+        white-space: pre;
+        overflow-wrap: normal;
+        word-break: normal;
+      }
+
+      /* Keep tables horizontally scrollable rather than crushing columns
+         into equal viewport-width quarters. Prose cells wrap to the
+         available width; an unbreakable file-path token sets the minimum
+         that triggers a clean sideways scroll. */
+      #doc table {
+        table-layout: auto;
       }
 
       #doc th,
       #doc td {
-        padding: 10px;
-        overflow-wrap: anywhere;
-        word-break: break-word;
+        padding: 9px 11px;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        overflow-wrap: normal;
+        word-break: normal;
+        white-space: normal;
       }
 
-      #doc table {
-        display: table;
-        table-layout: fixed;
-        overflow-x: visible;
+      /* Table cells carry data-block-id; don't let the generic block rule
+         force every cell to width:100% and fight the auto column sizing. */
+      #doc th[data-block-id],
+      #doc td[data-block-id] {
+        width: auto;
+        max-width: none;
+      }
+
+      /* Keep file-path code tokens whole so the File column claims its real
+         width instead of collapsing; the table scrolls sideways if needed. */
+      #doc th code,
+      #doc td code {
+        overflow-wrap: normal;
+        white-space: nowrap;
       }
 
       #doc [data-block-id] {
@@ -1928,7 +1966,7 @@
     </div>
     <div id="toolbar-right">
       <button id="btn-sidebar" class="toolbar-btn toolbar-btn--icon" title="Toggle sidebar" aria-label="Toggle sidebar" aria-controls="sidebar" aria-expanded="false">☰</button>
-      <button id="btn-done" class="toolbar-btn toolbar-btn--primary">Done</button>
+      <button id="btn-done" class="toolbar-btn toolbar-btn--primary">Done ✓</button>
     </div>
   </header>
 
