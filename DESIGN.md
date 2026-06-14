@@ -87,14 +87,14 @@ This explicitly rejects generic SaaS dashboard aesthetics: no card grids, no gra
 - **Display** (Inconsolata, Bold 700, fixed rem scale): Document h1 only. Larger than body on desktop, sharing the same physical text rail.
 - **Headline** (Inconsolata, Medium 500, fixed rem scale): Document h2-h3 and major section breaks.
 - **Title** (Inconsolata, Bold 700): Modal titles and major UI section headers.
-- **Body** (MesloLGM Nerd Font Mono Regular, 400): Document prose, annotation comments, controls, and modal body copy. Desktop document prose uses a viewport-based rail, about 70vw, so headings and body share the same physical width regardless of font size.
+- **Body** (MesloLGM Nerd Font Mono Regular, 400): Document prose, annotation comments, controls, and modal body copy. Desktop document prose uses a viewport-based rail, about 63vw, so headings and body share the same physical width regardless of font size.
 - **Label** (MesloLGM Nerd Font Mono Regular, synthetic 500 / 600): Block type badges, line numbers, toolbar labels, and compact metadata.
 - **Code** (MesloLGM Nerd Font Mono Regular, 400): Code blocks and inline code.
 
 ### Named Rules
 **The Two-Font Rule.** Inconsolata is for titles and headings. MesloLGM Nerd Font Mono Regular is for body, UI, metadata, annotations, inline code, and code blocks. Do not introduce a third family.
 
-**The Calm Mono Rule.** Body text stays at readable fixed rem sizes with generous line-height. Desktop markdown prose and h1-h3 headings share a physical text rail of about 70vw, capped by the visible document area so it does not run under the sidebar. The outer document rail is the text rail plus horizontal padding; tables and code blocks may use that full wider rail.
+**The Calm Mono Rule.** Body text stays at readable fixed rem sizes with generous line-height. Desktop markdown prose and h1-h3 headings share a physical text rail of about 63vw, capped by the visible document area so it does not run under the sidebar. The outer document rail is the text rail plus horizontal padding; tables and code blocks may use that full wider rail.
 
 ## 4. Elevation
 
