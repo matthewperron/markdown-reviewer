@@ -40,7 +40,7 @@
 
       --toolbar-h: 48px;
       --sidebar-w: 320px;
-      --doc-text-w: 63vw;
+      --doc-text-w: 60vw;
       --doc-pad-x: clamp(24px, 4vw, 72px);
       --doc-wide-w: calc(var(--doc-text-w) + var(--doc-pad-x) + var(--doc-pad-x));
       --radius: 6px;
@@ -261,7 +261,8 @@
       padding: 42px var(--doc-pad-x) 88px;
       overflow-wrap: break-word;
       font-size: 1rem;
-      line-height: 1.68;
+      line-height: 1.75;
+      letter-spacing: 0.01em;
     }
 
     #doc > :where(h1, h2, h3, p, ul, ol, blockquote, hr) {
@@ -281,7 +282,7 @@
     #doc h1 { font-size: 1.65rem; margin-top: 1.3em; margin-bottom: 0.65em; }
     #doc h2 { font-size: 1.24rem; margin-top: 1.85em; margin-bottom: 0.65em; }
     #doc h3 { font-size: 1.08rem; margin-top: 1.55em; margin-bottom: 0.55em; }
-    #doc p { margin-bottom: 1em; text-wrap: pretty; }
+    #doc p { margin-bottom: 1.2em; text-wrap: pretty; }
     #doc pre {
       font-family: var(--font-mono);
       background: oklch(0.22 0.012 268);
@@ -395,7 +396,7 @@
       margin-bottom: 1em;
       padding-left: 24px;
     }
-    #doc li { margin-bottom: 0.25em; }
+    #doc li { margin-bottom: 0.35em; }
     #doc hr {
       border: none;
       border-top: 1px solid var(--border);
@@ -1598,7 +1599,7 @@
         max-width: min(100%, 66ch);
         padding: 28px 18px 104px;
         font-size: 1rem;
-        line-height: 1.65;
+        line-height: 1.72;
       }
 
       #doc h1,
