@@ -16,16 +16,16 @@ colors:
   border: "oklch(0.34 0.02 270)"
 typography:
   display:
-    fontFamily: "IBM Plex Sans Condensed, IBM Plex Serif, -apple-system, BlinkMacSystemFont, Segoe UI, system-ui, sans-serif"
+    fontFamily: "IBM Plex Sans Condensed, IBM Plex Sans, -apple-system, BlinkMacSystemFont, Segoe UI, system-ui, sans-serif"
     fontWeight: 700
   headline:
-    fontFamily: "IBM Plex Sans Condensed, IBM Plex Serif, -apple-system, BlinkMacSystemFont, Segoe UI, system-ui, sans-serif"
+    fontFamily: "IBM Plex Sans Condensed, IBM Plex Sans, -apple-system, BlinkMacSystemFont, Segoe UI, system-ui, sans-serif"
     fontWeight: 400
   body:
-    fontFamily: "IBM Plex Serif, -apple-system, BlinkMacSystemFont, Segoe UI, system-ui, serif"
+    fontFamily: "IBM Plex Sans, -apple-system, BlinkMacSystemFont, Segoe UI, system-ui, sans-serif"
     fontWeight: 400
   label:
-    fontFamily: "IBM Plex Serif, -apple-system, BlinkMacSystemFont, Segoe UI, system-ui, serif"
+    fontFamily: "IBM Plex Sans, -apple-system, BlinkMacSystemFont, Segoe UI, system-ui, sans-serif"
     fontWeight: 500
   mono:
     fontFamily: "MesloLGM Nerd Font Mono, ui-monospace, SFMono-Regular, monospace"
@@ -47,7 +47,7 @@ This explicitly rejects generic SaaS dashboard aesthetics: no card grids, no gra
 **Key Characteristics:**
 - Soft terminal-dark surface by default: darker than `#282c34`, lighter than near-black, to reduce eye strain without washing out the page
 - Darker violet-blue chrome for toolbar and sidebar: navigation recedes behind the document, separated by soft shadow instead of hard divider lines
-- IBM Plex Sans Condensed headings + IBM Plex Serif body/UI: a condensed-sans/serif pairing with technical contrast between document voice and application chrome
+- IBM Plex Sans Condensed headings + IBM Plex Sans body/UI: a condensed/regular sans pairing with proportional contrast between document voice and application chrome
 - MesloLGM Nerd Font Mono Regular for inline code, code blocks, and `<pre>` content only
 - Restrained color: violet twilight and dark amethyst, used sparingly for annotations and actions
 - Responsive motion: transitions and state feedback, no choreography
@@ -84,18 +84,18 @@ This explicitly rejects generic SaaS dashboard aesthetics: no card grids, no gra
 **Body / UI Font:** IBM Serif: document prose, labels, buttons, metadata, and annotation comments.
 **Code Font:** MesloLGM Nerd Font Mono Regular: inline code, code blocks, and `<pre>` content.
 
-**Character:** Three-role system with clear separation of purpose. IBM Plex Sans Condensed gives headings a compact technical voice, IBM Plex Serif makes body and UI text editorial and legible, and MesloLGM Nerd Font Mono Regular preserves the familiar terminal texture where code appears. No other typefaces are used in the app.
+**Character:** Three-role system with clear separation of purpose. IBM Plex Sans Condensed gives headings a compact technical voice, IBM Plex Sans makes body and UI text clean and legible, and MesloLGM Nerd Font Mono Regular preserves the familiar terminal texture where code appears. No other typefaces are used in the app.
 
 ### Hierarchy
 - **Display** (IBM Plex Sans Condensed, Bold 700, fixed rem scale): Document h1 only. Larger than body on desktop, sharing the same physical text rail.
 - **Headline** (IBM Plex Sans Condensed, Regular 400, fixed rem scale): Document h2-h3 and major section breaks.
 - **Title** (IBM Plex Sans Condensed, Bold 700): Modal titles and major UI section headers.
-- **Body** (IBM Plex Serif, 400): Document prose, annotation comments, controls, and modal body copy. Desktop document prose uses a viewport-based rail, about 63vw, so headings and body share the same physical width regardless of font size.
-- **Label** (IBM Plex Serif, 500 / 600): Block type badges, line numbers, toolbar labels, and compact metadata.
+- **Body** (IBM Plex Sans, 400): Document prose, annotation comments, controls, and modal body copy. Desktop document prose uses a viewport-based rail, about 63vw, so headings and body share the same physical width regardless of font size.
+- **Label** (IBM Plex Sans, 500 / 600): Block type badges, line numbers, toolbar labels, and compact metadata.
 - **Code** (MesloLGM Nerd Font Mono Regular, 400): Code blocks and inline code.
 
 ### Named Rules
-**The Three-Role Font Rule.** IBM Plex Sans Condensed is for titles and headings. IBM Plex Serif is for body, UI, metadata, and annotations. MesloLGM Nerd Font Mono Regular is for inline code, code blocks, and `<pre>` content. Do not introduce another family.
+**The Three-Role Font Rule.** IBM Plex Sans Condensed is for titles and headings. IBM Plex Sans is for body, UI, metadata, and annotations. MesloLGM Nerd Font Mono Regular is for inline code, code blocks, and `<pre>` content. Do not introduce another family.
 
 **The Calm Mono Rule.** Body text stays at readable fixed rem sizes with generous line-height. Desktop markdown prose and h1-h3 headings share a physical text rail of about 63vw, capped by the visible document area so it does not run under the sidebar. The outer document rail is the text rail plus horizontal padding; tables may use that full wider rail, while code blocks shrink to content up to the same maximum.
 
@@ -122,7 +122,7 @@ Key components anticipated:
 - **Do** keep the markdown document as the dominant visual element. Chrome should frame, not compete.
 - **Do** use the accent color only for annotations and primary actions. Its scarcity makes it meaningful.
 - **Do** use IBM Plex Sans Condensed for document headings and major titles.
-- **Do** use IBM Plex Serif for body text, UI chrome, and annotations.
+- **Do** use IBM Plex Sans for body text, UI chrome, and annotations.
 - **Do** use MesloLGM Nerd Font Mono Regular for inline code, code blocks, and `<pre>` content.
 - **Do** use tonal layering instead of shadows for depth. Surface vs. surface-raised is enough.
 - **Do** keep transitions fast (150–250ms). Users are in flow; don't make them wait.

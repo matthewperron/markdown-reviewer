@@ -139,13 +139,18 @@ async function persistRelocations(entry: FileEntry, annotations: Annotation[], r
   }
 }
 
-/** Shared GET /annotations handler — returns relocated annotations. */
-async function handleGetAnnotations(entry: FileEntry): Promise<Response> {
+/** Relocate an entry's annotations, persist any moves, refresh its count. */
+async function relocatedAnnotations(entry: FileEntry): Promise<Annotation[]> {
   const annotations = await entry.session.list();
   const relocated = relocate(annotations, entry.blocks);
   await persistRelocations(entry, annotations, relocated);
   entry.annotationCount = relocated.length;
-  return json({ annotations: relocated.map((r) => r.annotation) });
+  return relocated.map((r) => r.annotation);
+}
+
+/** Shared GET /annotations handler — returns relocated annotations. */
+async function handleGetAnnotations(entry: FileEntry): Promise<Response> {
+  return json({ annotations: await relocatedAnnotations(entry) });
 }
 
 /** Shared POST /annotations handler — creates or updates an annotation. */
@@ -315,6 +320,12 @@ export async function startServer(opts: ServerOptions): Promise<RunningServer> {
     .replace("<!--FILE_NAME-->", fileName)
     .replace("<!--FILE_KEY-->", entryKey);
 
+  // Pre-gzip the two large, static text responses once at startup. The page
+  // and app.js never change for the life of the server, so there is no reason
+  // to recompress per request. Cuts critical-path bytes ~75% on the wire.
+  const renderedPageGz = Bun.gzipSync(renderedPage);
+  const appJsGz = Bun.gzipSync(appJs);
+
   // Stopped promise — resolves when the server shuts down (via stop() or self-shutdown)
   let resolveStopped: () => void;
   const stopped = new Promise<void>((resolve) => { resolveStopped = resolve; });
@@ -350,6 +361,11 @@ export async function startServer(opts: ServerOptions): Promise<RunningServer> {
 
       // GET / — prerendered page
       if (pathname === "/" && req.method === "GET") {
+        if (acceptsGzip(req)) {
+          return new Response(renderedPageGz, {
+            headers: { "Content-Type": "text/html; charset=utf-8", "Content-Encoding": "gzip" },
+          });
+        }
         return new Response(renderedPage, {
           headers: { "Content-Type": "text/html; charset=utf-8" },
         });
@@ -357,6 +373,11 @@ export async function startServer(opts: ServerOptions): Promise<RunningServer> {
 
       // GET /app.js — inline JS
       if (pathname === "/app.js" && req.method === "GET") {
+        if (acceptsGzip(req)) {
+          return new Response(appJsGz, {
+            headers: { "Content-Type": "application/javascript; charset=utf-8", "Content-Encoding": "gzip" },
+          });
+        }
         return new Response(appJs, {
           headers: { "Content-Type": "application/javascript; charset=utf-8" },
         });
@@ -431,9 +452,9 @@ export async function startServer(opts: ServerOptions): Promise<RunningServer> {
         // Return cached data if already loaded
         const cached = fileStore.get(key as FileKey);
         if (cached) {
-          // Refresh annotation count
-          const annotations = await cached.session.list();
-          cached.annotationCount = annotations.length;
+          // Fold relocated annotations into the load response so the client
+          // needs only one round trip per navigation (refreshes the count too).
+          const annotations = await relocatedAnnotations(cached);
 
           return json({
             source: cached.source,
@@ -443,6 +464,7 @@ export async function startServer(opts: ServerOptions): Promise<RunningServer> {
             fileName: cached.fileName,
             key: cached.key,
             annotationCount: cached.annotationCount,
+            annotations,
           });
         }
 
@@ -533,6 +555,7 @@ export async function startServer(opts: ServerOptions): Promise<RunningServer> {
             fileName: newEntry.fileName,
             key: newEntry.key,
             annotationCount: newEntry.annotationCount,
+            annotations: await relocatedAnnotations(newEntry),
           });
         } catch (err: any) {
           if (err.code === "ENOENT") {
@@ -786,6 +809,11 @@ function json(body: unknown, status = 200): Response {
     status,
     headers: { "Content-Type": "application/json; charset=utf-8" },
   });
+}
+
+/** True when the client advertises gzip support in Accept-Encoding. */
+function acceptsGzip(req: Request): boolean {
+  return (req.headers.get("accept-encoding") ?? "").toLowerCase().includes("gzip");
 }
 
 function normalizeHostname(host: string): string {

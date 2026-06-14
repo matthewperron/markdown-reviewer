@@ -29,7 +29,7 @@ Generic SaaS dashboards — card grids, gradient text, cream backgrounds, featur
 
 ## Typography Direction
 
-IBM Plex Sans Condensed is the title and heading voice. IBM Plex Serif is the body, UI, annotation, and metadata voice. MesloLGM Nerd Font Mono Regular is reserved for inline code, code blocks, and `<pre>` content. Meslo is self-hosted so code keeps its intended terminal texture without depending on an external font CDN.
+IBM Plex Sans Condensed is the title and heading voice. IBM Plex Sans is the body, UI, annotation, and metadata voice. MesloLGM Nerd Font Mono Regular is reserved for inline code, code blocks, and `<pre>` content. Meslo is self-hosted so code keeps its intended terminal texture without depending on an external font CDN.
 
 ## Accessibility & Inclusion
 

@@ -796,19 +796,22 @@
     if (fileState[key]) { switchToFile(key); return; }
     setStatus('loading ' + key + '...', 'warn');
     try {
+      // Single round trip: the file-load response now carries relocated
+      // annotations, so navigation paints after one request instead of two.
       var mdRes = await api('/api/files/' + encodeURIComponent(key));
-      var annRes = await api('/api/files/' + encodeURIComponent(key) + '/annotations');
+      var anns = mdRes.annotations || [];
       fileState[key] = {
         key: key,
         fileName: mdRes.fileName,
         fullHtml: mdRes.fullHtml,
         blocks: mdRes.blocks,
-        annotations: annRes.annotations,
-        annotationCount: annRes.annotations.length
+        annotations: anns,
+        annotationCount: anns.length
       };
       switchToFile(key);
-      await refreshSessionFiles();
       setStatus('loaded ' + mdRes.fileName, 'ok');
+      // File-zone refresh is not needed before paint — let it run after.
+      refreshSessionFiles();
     } catch (err) {
       setStatus('error: ' + err.message, 'error');
     }
