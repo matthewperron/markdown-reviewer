@@ -23,6 +23,11 @@ bun run start <file>     # start the tool against a markdown file
 bun run dev <file>       # start with --watch for dev iteration
 ```
 
+## Nix / NixOS integration
+
+- Keep the flake working whenever dependencies, runtime files, or packaging inputs change. If `package.json`, `bun.lock`, `bunfig.toml`, `flake.nix`, `src/`, or `public/` changes in a way that affects the packaged app, run or explicitly account for `nix build .#markdown-reviewer` and `nix flake check`.
+- The `node_modules` derivation in `flake.nix` is fixed-output. After dependency changes, update its `outputHash` so the packaged `mdr` can resolve every runtime import.
+
 ## User preferences
 
 - The user prefers to do hands-on UI testing themselves. For UI changes, keep automated/end-to-end browser verification light unless explicitly requested; share the local URL or changed files so the user can quickly test and give feedback.

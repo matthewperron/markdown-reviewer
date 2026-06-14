@@ -75,7 +75,7 @@
 
           outputHashMode = "recursive";
           outputHashAlgo = "sha256";
-          outputHash = "sha256-vFeM9Jg0/s82uFzr2Fy82iW7HH/zjeclabiYBjGoPgk=";
+          outputHash = "sha256-yg0K80Rhk/Gq9+y325/mt1+HfBKthSSLOOhypfVd4KM=";
         };
 
         # Full app source (used by the package and the test check).
