@@ -3,6 +3,7 @@ name: markdown-reviewer
 description: CLI markdown annotation tool with a browser-based review UI
 colors:
   violet-twilight: "oklch(0.70 0.16 292)"
+  violet-deep: "oklch(0.40 0.16 292)"
   dark-amethyst: "oklch(0.223 0.090 318.94)"
   violet-tint: "oklch(0.72 0.14 295)"
   surface: "oklch(0.20 0.012 268)"
@@ -58,6 +59,7 @@ This explicitly rejects generic SaaS dashboard aesthetics: no card grids, no gra
 
 ### Primary
 - **Violet Twilight** `oklch(0.70 0.16 292)`: Annotation highlights, primary buttons, active states, links. The interactive brand color, bright enough for cheap LCDs in bright rooms. Use dark text on this fill.
+- **Violet Deep** `oklch(0.40 0.16 292)`: Number badges and count pills. A committed fill dark enough for dark text, saturated enough to read as the brand accent.
 - **Dark Amethyst** `oklch(0.223 0.090 318.94)`: Annotation overlay backgrounds, borders, tinted surfaces. Too dark for filled buttons; used as a surface modifier.
 - **Violet Tint** `oklch(0.72 0.14 295)`: Filled badges, status pills, tag highlights. Derived lighter tint for readable filled elements.
 
