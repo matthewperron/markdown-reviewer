@@ -175,14 +175,50 @@
     }
 
     .toolbar-btn--primary {
+      position: relative;
       background: var(--violet-twilight);
       border-color: var(--violet-twilight);
       color: var(--surface);
+      overflow: hidden;
+      transition: background var(--transition-fast),
+                  border-color var(--transition-fast),
+                  transform 100ms cubic-bezier(0.25, 1, 0.5, 1),
+                  box-shadow 200ms cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .toolbar-btn--primary::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        105deg,
+        transparent 40%,
+        oklch(1 0 0 / 0.12) 50%,
+        transparent 60%
+      );
+      transform: translateX(-100%);
+      transition: transform 500ms cubic-bezier(0.25, 1, 0.5, 1);
     }
 
     .toolbar-btn--primary:hover {
       background: oklch(0.76 0.15 292);
       border-color: oklch(0.76 0.15 292);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px oklch(0.70 0.16 292 / 0.35);
+    }
+
+    .toolbar-btn--primary:hover::before {
+      transform: translateX(100%);
+    }
+
+    .toolbar-btn--primary:active {
+      transform: translateY(1px) scale(0.97);
+      box-shadow: 0 1px 4px oklch(0.70 0.16 292 / 0.2);
+    }
+
+    .toolbar-btn--primary:disabled {
+      opacity: 0.6;
+      pointer-events: none;
     }
 
     .toolbar-btn--icon {
