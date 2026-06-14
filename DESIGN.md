@@ -94,7 +94,7 @@ This explicitly rejects generic SaaS dashboard aesthetics: no card grids, no gra
 ### Named Rules
 **The Two-Font Rule.** Inconsolata is for titles and headings. MesloLGM Nerd Font Mono Regular is for body, UI, metadata, annotations, inline code, and code blocks. Do not introduce a third family.
 
-**The Calm Mono Rule.** Body text stays at readable fixed rem sizes with generous line-height. Desktop markdown prose and h1-h3 headings share a physical text rail of about 63vw, capped by the visible document area so it does not run under the sidebar. The outer document rail is the text rail plus horizontal padding; tables and code blocks may use that full wider rail.
+**The Calm Mono Rule.** Body text stays at readable fixed rem sizes with generous line-height. Desktop markdown prose and h1-h3 headings share a physical text rail of about 63vw, capped by the visible document area so it does not run under the sidebar. The outer document rail is the text rail plus horizontal padding; tables may use that full wider rail, while code blocks shrink to content up to the same maximum.
 
 ## 4. Elevation
 
