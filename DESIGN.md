@@ -21,13 +21,13 @@ typography:
     fontFamily: "Inconsolata, ui-monospace, SFMono-Regular, monospace"
     fontWeight: 500
   body:
-    fontFamily: "Fira Code, ui-monospace, SFMono-Regular, monospace"
+    fontFamily: "MesloLGM Nerd Font Mono, ui-monospace, SFMono-Regular, monospace"
     fontWeight: 400
   label:
-    fontFamily: "Fira Code, ui-monospace, SFMono-Regular, monospace"
+    fontFamily: "MesloLGM Nerd Font Mono, ui-monospace, SFMono-Regular, monospace"
     fontWeight: 500
   mono:
-    fontFamily: "Fira Code, ui-monospace, SFMono-Regular, monospace"
+    fontFamily: "MesloLGM Nerd Font Mono, ui-monospace, SFMono-Regular, monospace"
     fontWeight: 400
 ---
 
@@ -39,15 +39,15 @@ typography:
 
 **Creative North Star: "The Annotated Terminal"**
 
-A developer tool that borrows the authority of a terminal and the clarity of a typeset document. The interface is dark, high-contrast, and unapologetically focused on the markdown content. Violet and amethyst accents mark annotations and primary actions: sparse, deliberate, never decorative. Inconsolata carries document headings with a slightly larger, sharper technical voice; Fira Code handles body text, UI chrome, inline code, and code blocks with a calmer texture for long review sessions.
+A developer tool that borrows the authority of a terminal and the clarity of a typeset document. The interface is dark, high-contrast, and unapologetically focused on the markdown content. Violet and amethyst accents mark annotations and primary actions: sparse, deliberate, never decorative. Inconsolata carries document headings with a slightly larger, sharper technical voice; MesloLGM Nerd Font Mono Regular handles body text, UI chrome, inline code, and code blocks with a terminal-native texture for long review sessions.
 
 This explicitly rejects generic SaaS dashboard aesthetics: no card grids, no gradient text, no cream backgrounds, no feature walls. This is a single-purpose tool for people who read and write markdown for a living.
 
 **Key Characteristics:**
 - Soft terminal-dark surface by default: darker than `#282c34`, lighter than near-black, to reduce eye strain without washing out the page
 - Darker violet-blue chrome for toolbar and sidebar: navigation recedes behind the document, separated by soft shadow instead of hard divider lines
-- Inconsolata headings + Fira Code body: a two-font monospace system tuned for non-retina displays
-- Fira Code for UI, prose, inline code, and code blocks: no third font family
+- Inconsolata headings + MesloLGM Nerd Font Mono Regular body: a two-font monospace system tuned for developer reading surfaces
+- MesloLGM Nerd Font Mono Regular for UI, prose, inline code, and code blocks: no third font family
 - Restrained color: violet twilight and dark amethyst, used sparingly for annotations and actions
 - Responsive motion: transitions and state feedback, no choreography
 - Content-first layout: the markdown document fills the viewport; chrome is minimal
@@ -79,20 +79,20 @@ This explicitly rejects generic SaaS dashboard aesthetics: no card grids, no gra
 ## 3. Typography
 
 **Display Font:** Inconsolata: document headings (h1-h3), modal titles, and strong section labels.
-**Body / UI Font:** Fira Code: document prose, labels, buttons, metadata, annotation comments, inline code, and code blocks.
+**Body / UI Font:** MesloLGM Nerd Font Mono Regular: document prose, labels, buttons, metadata, annotation comments, inline code, and code blocks.
 
-**Character:** Two-font monospace system with clear separation of roles. Inconsolata gives headings a sharper technical voice at a slightly larger scale; Fira Code carries the dense reading surface without the fatiguing texture of the previous pairing on non-retina displays. No other typefaces are used in the app.
+**Character:** Two-font monospace system with clear separation of roles. Inconsolata gives headings a sharper technical voice at a slightly larger scale; MesloLGM Nerd Font Mono Regular carries the dense reading surface with a familiar terminal texture. No other typefaces are used in the app.
 
 ### Hierarchy
 - **Display** (Inconsolata, Bold 700, fixed rem scale): Document h1 only. Larger than body on desktop, sharing the same physical text rail.
 - **Headline** (Inconsolata, Medium 500, fixed rem scale): Document h2-h3 and major section breaks.
 - **Title** (Inconsolata, Bold 700): Modal titles and major UI section headers.
-- **Body** (Fira Code, Regular 400): Document prose, annotation comments, controls, and modal body copy. Desktop document prose uses a viewport-based rail, about 70vw, so headings and body share the same physical width regardless of font size.
-- **Label** (Fira Code, Medium 500 / Semi-bold 600): Block type badges, line numbers, toolbar labels, and compact metadata.
-- **Code** (Fira Code, Regular 400 / Medium 500): Code blocks and inline code.
+- **Body** (MesloLGM Nerd Font Mono Regular, 400): Document prose, annotation comments, controls, and modal body copy. Desktop document prose uses a viewport-based rail, about 70vw, so headings and body share the same physical width regardless of font size.
+- **Label** (MesloLGM Nerd Font Mono Regular, synthetic 500 / 600): Block type badges, line numbers, toolbar labels, and compact metadata.
+- **Code** (MesloLGM Nerd Font Mono Regular, 400): Code blocks and inline code.
 
 ### Named Rules
-**The Two-Font Rule.** Inconsolata is for titles and headings. Fira Code is for body, UI, metadata, annotations, inline code, and code blocks. Do not introduce a third family.
+**The Two-Font Rule.** Inconsolata is for titles and headings. MesloLGM Nerd Font Mono Regular is for body, UI, metadata, annotations, inline code, and code blocks. Do not introduce a third family.
 
 **The Calm Mono Rule.** Body text stays at readable fixed rem sizes with generous line-height. Desktop markdown prose and h1-h3 headings share a physical text rail of about 70vw, capped by the visible document area so it does not run under the sidebar. The outer document rail is the text rail plus horizontal padding; tables and code blocks may use that full wider rail.
 
@@ -119,7 +119,7 @@ Key components anticipated:
 - **Do** keep the markdown document as the dominant visual element. Chrome should frame, not compete.
 - **Do** use the accent color only for annotations and primary actions. Its scarcity makes it meaningful.
 - **Do** use Inconsolata for document headings and major titles.
-- **Do** use Fira Code for body text, UI chrome, annotations, inline code, and code blocks.
+- **Do** use MesloLGM Nerd Font Mono Regular for body text, UI chrome, annotations, inline code, and code blocks.
 - **Do** use tonal layering instead of shadows for depth. Surface vs. surface-raised is enough.
 - **Do** keep transitions fast (150–250ms). Users are in flow; don't make them wait.
 

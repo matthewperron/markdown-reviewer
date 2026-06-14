@@ -27,6 +27,10 @@ Generic SaaS dashboards — card grids, gradient text, cream backgrounds, featur
 3. **Expert confidence.** Bold, opinionated choices that signal a tool built by practitioners, not a generic scaffold.
 4. **Resilience by default.** Session resumption, orphan handling, persistence. The tool handles failure gracefully without the user asking.
 
+## Typography Direction
+
+Inconsolata is the title and heading voice. MesloLGM Nerd Font Mono Regular is the body, UI, annotation, metadata, inline code, and code block voice. The Meslo font is self-hosted so the local reviewer keeps its intended reading texture without depending on an external font CDN.
+
 ## Accessibility & Inclusion
 
 Best effort. Basic keyboard navigation for the modal interface. No specific WCAG target. Reduced motion support where animations are present.

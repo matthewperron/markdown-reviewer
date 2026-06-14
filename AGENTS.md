@@ -9,7 +9,7 @@ A browser-based markdown annotation tool. Run `mdr file.md`, click blocks in the
 - **Bun only** — runtime, HTTP server, package manager, test runner.
 - **ESM-only remark v11 stack** — `unified`, `remark-parse`, `remark-gfm`, `remark-frontmatter`, `remark-rehype`, `hast-util-to-html`, `mdast-util-to-string`, `unist-util-visit`.
 - **QR codes** — `qrcode-terminal` for LAN mode sharing.
-- **Fonts** - Inconsolata (Google Fonts, titles/headings) and Fira Code (Google Fonts, body/UI/code). These are the only two typefaces used by the app.
+- **Fonts** - Inconsolata (Google Fonts, titles/headings) and self-hosted MesloLGM Nerd Font Mono Regular (body/UI/code). These are the only two typefaces used by the app.
 - **TypeScript** — strict, no emit (`module: esnext`, `moduleResolution: bundler`, `verbatimModuleSyntax`, `noEmit`).
 - **No build step** — the server renders HTML via `remark-rehype` → `hast-util-to-html`; the review generator splices markers directly into the original source string.
 
