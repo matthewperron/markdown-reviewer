@@ -74,6 +74,39 @@ describe("parseDocument", () => {
     expect(codeBlocks[0].html).toContain(`data-block-id="${codeBlocks[0].id}"`);
   });
 
+  test("highlights code blocks with explicit language classes", () => {
+    const source = "```ts\nexport function greet(name: string) { return name; }\n```";
+    const { blocks, fullHtml } = parseDocument(source);
+    const code = blocks.find((b) => b.type === "code");
+
+    expect(code).toBeDefined();
+    expect(code!.html).toContain("hljs language-ts");
+    expect(code!.html).toContain("hljs-title function_");
+    expect(fullHtml).toContain("hljs-keyword");
+  });
+
+  test("auto-detects and highlights unlabeled code blocks", () => {
+    const source = "```\nfunction greet(name) { return name; }\n```";
+    const { blocks } = parseDocument(source);
+    const code = blocks.find((b) => b.type === "code");
+
+    expect(code).toBeDefined();
+    expect(code!.html).toContain("hljs");
+    expect(code!.html).toContain("language-");
+    expect(code!.html).toContain("<span");
+  });
+
+  test("leaves explicit plain text code blocks unhighlighted", () => {
+    const source = "```text\nthis is an example, not executable code\n```";
+    const { blocks } = parseDocument(source);
+    const code = blocks.find((b) => b.type === "code");
+
+    expect(code).toBeDefined();
+    expect(code!.html).toContain("language-text");
+    expect(code!.html).not.toContain("hljs");
+    expect(code!.html).not.toContain("<span");
+  });
+
   test("renders blockquotes with data-block-id", () => {
     const { blocks } = parseDocument("> This is a quote");
     const bqBlocks = blocks.filter((b) => b.type === "blockquote");

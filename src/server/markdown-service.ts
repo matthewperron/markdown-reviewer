@@ -3,8 +3,10 @@ import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkRehype from "remark-rehype";
+import rehypeHighlight from "rehype-highlight";
 import { toHtml } from "hast-util-to-html";
 import { visit } from "unist-util-visit";
+import { all as lowlightLanguages } from "lowlight";
 import { resolve, dirname, relative } from "node:path";
 import { realpath, stat } from "node:fs/promises";
 import type { BlockNode, MdLink, FileKey } from "../shared/types";
@@ -20,6 +22,12 @@ const ANNOTATABLE_TYPES = new Set([
 ]);
 
 const SKIP_TYPES = new Set(["yaml", "toml", "thematicBreak", "html"]);
+
+const CODE_HIGHLIGHT_OPTIONS = {
+  detect: true,
+  languages: lowlightLanguages,
+  plainText: ["text", "txt", "plain", "plaintext"],
+} as const;
 
 /**
  * Extract plain text from a node for display purposes.
@@ -272,7 +280,8 @@ export function parseDocument(source: string): { source: string; blocks: BlockNo
     .use(remarkParse)
     .use(remarkGfm)
     .use(remarkFrontmatter, ["yaml", "toml"])
-    .use(remarkRehype, { allowDangerousHtml: true });
+    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeHighlight, CODE_HIGHLIGHT_OPTIONS);
 
   const tree = processor.parse(source);
 
@@ -338,7 +347,8 @@ export async function loadDocument(
       .use(remarkParse)
       .use(remarkGfm)
       .use(remarkFrontmatter, ["yaml", "toml"])
-      .use(remarkRehype, { allowDangerousHtml: true });
+      .use(remarkRehype, { allowDangerousHtml: true })
+      .use(rehypeHighlight, CODE_HIGHLIGHT_OPTIONS);
 
     const tree = processor.parse(source);
 
