@@ -29,7 +29,7 @@ Generic SaaS dashboards — card grids, gradient text, cream backgrounds, featur
 
 ## Typography Direction
 
-Inconsolata is the title and heading voice. MesloLGM Nerd Font Mono Regular is the body, UI, annotation, metadata, inline code, and code block voice. The Meslo font is self-hosted so the local reviewer keeps its intended reading texture without depending on an external font CDN.
+Ovo is the title and heading voice. Mulish is the body, UI, annotation, and metadata voice. MesloLGM Nerd Font Mono Regular is reserved for inline code, code blocks, and `<pre>` content. Meslo is self-hosted so code keeps its intended terminal texture without depending on an external font CDN.
 
 ## Accessibility & Inclusion
 

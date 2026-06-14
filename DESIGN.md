@@ -15,16 +15,16 @@ colors:
   border: "oklch(0.34 0.02 270)"
 typography:
   display:
-    fontFamily: "Inconsolata, ui-monospace, SFMono-Regular, monospace"
+    fontFamily: "Ovo, Mulish, -apple-system, BlinkMacSystemFont, Segoe UI, system-ui, sans-serif"
     fontWeight: 700
   headline:
-    fontFamily: "Inconsolata, ui-monospace, SFMono-Regular, monospace"
-    fontWeight: 500
+    fontFamily: "Ovo, Mulish, -apple-system, BlinkMacSystemFont, Segoe UI, system-ui, sans-serif"
+    fontWeight: 400
   body:
-    fontFamily: "MesloLGM Nerd Font Mono, ui-monospace, SFMono-Regular, monospace"
+    fontFamily: "Mulish, -apple-system, BlinkMacSystemFont, Segoe UI, system-ui, sans-serif"
     fontWeight: 400
   label:
-    fontFamily: "MesloLGM Nerd Font Mono, ui-monospace, SFMono-Regular, monospace"
+    fontFamily: "Mulish, -apple-system, BlinkMacSystemFont, Segoe UI, system-ui, sans-serif"
     fontWeight: 500
   mono:
     fontFamily: "MesloLGM Nerd Font Mono, ui-monospace, SFMono-Regular, monospace"
@@ -39,15 +39,15 @@ typography:
 
 **Creative North Star: "The Annotated Terminal"**
 
-A developer tool that borrows the authority of a terminal and the clarity of a typeset document. The interface is dark, high-contrast, and unapologetically focused on the markdown content. Violet and amethyst accents mark annotations and primary actions: sparse, deliberate, never decorative. Inconsolata carries document headings with a slightly larger, sharper technical voice; MesloLGM Nerd Font Mono Regular handles body text, UI chrome, inline code, and code blocks with a terminal-native texture for long review sessions.
+A developer tool that borrows the authority of a terminal and the clarity of a typeset document. The interface is dark, high-contrast, and unapologetically focused on the markdown content. Violet and amethyst accents mark annotations and primary actions: sparse, deliberate, never decorative. Ovo carries document headings with a distinctive editorial serif voice, Mulish handles body text and UI chrome, and MesloLGM Nerd Font Mono Regular keeps inline code and code blocks terminal-native.
 
 This explicitly rejects generic SaaS dashboard aesthetics: no card grids, no gradient text, no cream backgrounds, no feature walls. This is a single-purpose tool for people who read and write markdown for a living.
 
 **Key Characteristics:**
 - Soft terminal-dark surface by default: darker than `#282c34`, lighter than near-black, to reduce eye strain without washing out the page
 - Darker violet-blue chrome for toolbar and sidebar: navigation recedes behind the document, separated by soft shadow instead of hard divider lines
-- Inconsolata headings + MesloLGM Nerd Font Mono Regular body: a two-font monospace system tuned for developer reading surfaces
-- MesloLGM Nerd Font Mono Regular for UI, prose, inline code, and code blocks: no third font family
+- Ovo headings + Mulish body/UI: a serif/sans pairing with clear editorial contrast between document voice and application chrome
+- MesloLGM Nerd Font Mono Regular for inline code, code blocks, and `<pre>` content only
 - Restrained color: violet twilight and dark amethyst, used sparingly for annotations and actions
 - Responsive motion: transitions and state feedback, no choreography
 - Content-first layout: the markdown document fills the viewport; chrome is minimal
@@ -78,21 +78,22 @@ This explicitly rejects generic SaaS dashboard aesthetics: no card grids, no gra
 
 ## 3. Typography
 
-**Display Font:** Inconsolata: document headings (h1-h3), modal titles, and strong section labels.
-**Body / UI Font:** MesloLGM Nerd Font Mono Regular: document prose, labels, buttons, metadata, annotation comments, inline code, and code blocks.
+**Display Font:** Ovo: document headings (h1-h3), modal titles, and strong section labels.
+**Body / UI Font:** Mulish: document prose, labels, buttons, metadata, and annotation comments.
+**Code Font:** MesloLGM Nerd Font Mono Regular: inline code, code blocks, and `<pre>` content.
 
-**Character:** Two-font monospace system with clear separation of roles. Inconsolata gives headings a sharper technical voice at a slightly larger scale; MesloLGM Nerd Font Mono Regular carries the dense reading surface with a familiar terminal texture. No other typefaces are used in the app.
+**Character:** Three-role system with clear separation of purpose. Ovo gives headings a distinctive editorial serif voice, Mulish makes body and UI text clean and highly legible, and MesloLGM Nerd Font Mono Regular preserves the familiar terminal texture where code appears. No other typefaces are used in the app.
 
 ### Hierarchy
-- **Display** (Inconsolata, Bold 700, fixed rem scale): Document h1 only. Larger than body on desktop, sharing the same physical text rail.
-- **Headline** (Inconsolata, Medium 500, fixed rem scale): Document h2-h3 and major section breaks.
-- **Title** (Inconsolata, Bold 700): Modal titles and major UI section headers.
-- **Body** (MesloLGM Nerd Font Mono Regular, 400): Document prose, annotation comments, controls, and modal body copy. Desktop document prose uses a viewport-based rail, about 63vw, so headings and body share the same physical width regardless of font size.
-- **Label** (MesloLGM Nerd Font Mono Regular, synthetic 500 / 600): Block type badges, line numbers, toolbar labels, and compact metadata.
+- **Display** (Ovo, Bold 700, fixed rem scale): Document h1 only. Larger than body on desktop, sharing the same physical text rail.
+- **Headline** (Ovo, Regular 400, fixed rem scale): Document h2-h3 and major section breaks.
+- **Title** (Ovo, Bold 700): Modal titles and major UI section headers.
+- **Body** (Mulish, 400): Document prose, annotation comments, controls, and modal body copy. Desktop document prose uses a viewport-based rail, about 63vw, so headings and body share the same physical width regardless of font size.
+- **Label** (Mulish, 500 / 600): Block type badges, line numbers, toolbar labels, and compact metadata.
 - **Code** (MesloLGM Nerd Font Mono Regular, 400): Code blocks and inline code.
 
 ### Named Rules
-**The Two-Font Rule.** Inconsolata is for titles and headings. MesloLGM Nerd Font Mono Regular is for body, UI, metadata, annotations, inline code, and code blocks. Do not introduce a third family.
+**The Three-Role Font Rule.** Ovo is for titles and headings. Mulish is for body, UI, metadata, and annotations. MesloLGM Nerd Font Mono Regular is for inline code, code blocks, and `<pre>` content. Do not introduce another family.
 
 **The Calm Mono Rule.** Body text stays at readable fixed rem sizes with generous line-height. Desktop markdown prose and h1-h3 headings share a physical text rail of about 63vw, capped by the visible document area so it does not run under the sidebar. The outer document rail is the text rail plus horizontal padding; tables may use that full wider rail, while code blocks shrink to content up to the same maximum.
 
@@ -118,8 +119,9 @@ Key components anticipated:
 ### Do:
 - **Do** keep the markdown document as the dominant visual element. Chrome should frame, not compete.
 - **Do** use the accent color only for annotations and primary actions. Its scarcity makes it meaningful.
-- **Do** use Inconsolata for document headings and major titles.
-- **Do** use MesloLGM Nerd Font Mono Regular for body text, UI chrome, annotations, inline code, and code blocks.
+- **Do** use Ovo for document headings and major titles.
+- **Do** use Mulish for body text, UI chrome, and annotations.
+- **Do** use MesloLGM Nerd Font Mono Regular for inline code, code blocks, and `<pre>` content.
 - **Do** use tonal layering instead of shadows for depth. Surface vs. surface-raised is enough.
 - **Do** keep transitions fast (150–250ms). Users are in flow; don't make them wait.
 
