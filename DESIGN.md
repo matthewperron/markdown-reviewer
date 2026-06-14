@@ -2,30 +2,33 @@
 name: markdown-reviewer
 description: CLI markdown annotation tool with a browser-based review UI
 colors:
-  violet-twilight: "oklch(0.481 0.194 289.55)"
+  violet-twilight: "oklch(0.70 0.16 292)"
   dark-amethyst: "oklch(0.223 0.090 318.94)"
   violet-tint: "oklch(0.72 0.14 295)"
-  surface: "oklch(0.08 0.000 0)"
-  surface-raised: "oklch(0.14 0.000 0)"
-  text-primary: "oklch(0.94 0.008 300)"
+  surface: "oklch(0.20 0.012 268)"
+  surface-raised: "oklch(0.26 0.015 268)"
+  surface-chrome: "oklch(0.155 0.018 286)"
+  chrome-shadow: "oklch(0.10 0.018 286 / 0.14)"
+  chrome-shadow-strong: "oklch(0.10 0.018 286 / 0.18)"
+  text-primary: "oklch(0.85 0.008 300)"
   text-muted: "oklch(0.62 0.01 300)"
-  border: "oklch(0.20 0.03 310)"
+  border: "oklch(0.34 0.02 270)"
 typography:
   display:
-    fontFamily: "Epunda Slab, serif"
+    fontFamily: "Inconsolata, ui-monospace, SFMono-Regular, monospace"
     fontWeight: 700
   headline:
-    fontFamily: "Epunda Slab, serif"
-    fontWeight: 400
+    fontFamily: "Inconsolata, ui-monospace, SFMono-Regular, monospace"
+    fontWeight: 500
   body:
-    fontFamily: "Epunda Sans, system-ui, sans-serif"
+    fontFamily: "Fira Code, ui-monospace, SFMono-Regular, monospace"
     fontWeight: 400
   label:
-    fontFamily: "Epunda Sans, system-ui, sans-serif"
+    fontFamily: "Fira Code, ui-monospace, SFMono-Regular, monospace"
     fontWeight: 500
   mono:
-    fontFamily: "SUSE Mono, ui-monospace, SFMono-Regular, monospace"
-    fontWeight: 500
+    fontFamily: "Fira Code, ui-monospace, SFMono-Regular, monospace"
+    fontWeight: 400
 ---
 
 <!-- SEED: re-run /impeccable document once there's code to capture the actual tokens and components. -->
@@ -36,59 +39,62 @@ typography:
 
 **Creative North Star: "The Annotated Terminal"**
 
-A developer tool that borrows the authority of a terminal and the clarity of a typeset document. The interface is dark, high-contrast, and unapologetically focused on the markdown content. Violet and amethyst accents mark annotations and primary actions — sparse, deliberate, never decorative. Zain carries document headings with distinctive geometric character; Nunito handles body text and all UI chrome with rounded humanist warmth. SUSE Mono is reserved for code blocks. The pairing signals confidence: expressive display headings, friendly readable prose, precise code.
+A developer tool that borrows the authority of a terminal and the clarity of a typeset document. The interface is dark, high-contrast, and unapologetically focused on the markdown content. Violet and amethyst accents mark annotations and primary actions: sparse, deliberate, never decorative. Inconsolata carries document headings with a slightly larger, sharper technical voice; Fira Code handles body text, UI chrome, inline code, and code blocks with a calmer texture for long review sessions.
 
 This explicitly rejects generic SaaS dashboard aesthetics: no card grids, no gradient text, no cream backgrounds, no feature walls. This is a single-purpose tool for people who read and write markdown for a living.
 
 **Key Characteristics:**
-- Dark surface by default — the user is reviewing documents, often in dim environments
-- Zain headings + Nunito body — geometric display paired with rounded humanist readability
-- SUSE Mono for code only — monospace reserved for code blocks, not headings
-- Restrained color — violet twilight and dark amethyst, used sparingly for annotations and actions
-- Responsive motion — transitions and state feedback, no choreography
-- Content-first layout — the markdown document fills the viewport; chrome is minimal
+- Soft terminal-dark surface by default: darker than `#282c34`, lighter than near-black, to reduce eye strain without washing out the page
+- Darker violet-blue chrome for toolbar and sidebar: navigation recedes behind the document, separated by soft shadow instead of hard divider lines
+- Inconsolata headings + Fira Code body: a two-font monospace system tuned for non-retina displays
+- Fira Code for UI, prose, inline code, and code blocks: no third font family
+- Restrained color: violet twilight and dark amethyst, used sparingly for annotations and actions
+- Responsive motion: transitions and state feedback, no choreography
+- Content-first layout: the markdown document fills the viewport; chrome is minimal
 
 ## 2. Colors
 
 **Strategy: Restrained.** Dark neutrals carry the surface; violet and amethyst mark annotations and primary actions at ≤10% of any given screen.
 
 ### Primary
-- **Violet Twilight** `oklch(0.481 0.194 289.55)`: Annotation highlights, primary buttons, active states, links. The interactive brand color. White text on this fill.
+- **Violet Twilight** `oklch(0.70 0.16 292)`: Annotation highlights, primary buttons, active states, links. The interactive brand color, bright enough for cheap LCDs in bright rooms. Use dark text on this fill.
 - **Dark Amethyst** `oklch(0.223 0.090 318.94)`: Annotation overlay backgrounds, borders, tinted surfaces. Too dark for filled buttons; used as a surface modifier.
 - **Violet Tint** `oklch(0.72 0.14 295)`: Filled badges, status pills, tag highlights. Derived lighter tint for readable filled elements.
 
 ### Neutral
-- **Surface** `oklch(0.08 0.000 0)`: Main background. Pure near-black, no hue tint.
-- **Surface raised** `oklch(0.14 0.000 0)`: Toolbars, modals, panels. Slightly lighter than surface.
-- **Text primary** `oklch(0.94 0.008 300)`: Body copy, headings. Near-white with subtle purple warmth. ≥12:1 against surface.
+- **Surface** `oklch(0.20 0.012 268)`: Main background. A midpoint between the original near-black UI and the sampled terminal setting, reducing glare without making the page feel washed out.
+- **Surface raised** `oklch(0.26 0.015 268)`: Modals, panels, and raised controls. Slightly lighter than surface.
+- **Surface chrome** `oklch(0.155 0.018 286)`: Toolbar and sidebar background. Darker than the document body so app chrome recedes.
+- **Chrome shadow** `oklch(0.10 0.018 286 / 0.14)`: Toolbar separation. Avoid hard divider lines between layout regions.
+- **Chrome shadow strong** `oklch(0.10 0.018 286 / 0.18)`: Sidebar separation when open. Still soft, never a visible panel rule.
+- **Text primary** `oklch(0.85 0.008 300)`: Body copy, headings. Soft near-white with subtle purple warmth, dimmed to reduce LCD glare while staying readable against the dark surface.
 - **Text muted** `oklch(0.62 0.01 300)`: Metadata, labels, advisory text. ≥4.5:1 against surface.
-- **Border** `oklch(0.20 0.03 310)`: Dividers, block boundaries. Subtle purple tint.
+- **Border** `oklch(0.34 0.02 270)`: Dividers, block boundaries. Lifted enough for visibility on the softened terminal-dark surface.
 
 ### Named Rules
-**The Annotation Mark Rule.** The primary accent appears only on annotated blocks, primary actions, and active states. Its rarity is the point — when you see it, something is flagged.
+**The Annotation Mark Rule.** The primary accent appears only on annotated blocks, primary actions, and active states. Annotated blocks use a borderless `oklch(0.3 0.08 300)` background wash so the mark is visible without boxing the content.
 
-**The Dark Default Rule.** The UI ships dark. The user is reviewing documents in a focused work session, often alongside a terminal or IDE. Light mode is not a priority.
+**The Dark Default Rule.** The UI ships terminal-dark, not near-black. The user is reviewing documents in a focused work session, often alongside a terminal or IDE. Light mode is not a priority.
 
 ## 3. Typography
 
-**Display Font:** Zain — Geometric sans-serif for document headings (h1–h3). Distinctive Arabic-influenced letterforms with strong vertical character and bold presence.
-**Body / UI Font:** Nunito — Rounded humanist sans-serif for all body text, labels, buttons, metadata, and UI chrome. Warm, friendly, and highly legible at small sizes.
-**Mono Font:** SUSE Mono — Monospace for code blocks and inline code only. Self-hosted .woff2 files.
+**Display Font:** Inconsolata: document headings (h1-h3), modal titles, and strong section labels.
+**Body / UI Font:** Fira Code: document prose, labels, buttons, metadata, annotation comments, inline code, and code blocks.
 
-**Character:** Three-font pairing with clear separation of concerns. Zain carries the document structure with geometric authority. Nunito handles everything else with rounded humanist warmth. SUSE Mono is strictly for code — never headings, never UI. The pairing signals "expert tool, not generic scaffold."
+**Character:** Two-font monospace system with clear separation of roles. Inconsolata gives headings a sharper technical voice at a slightly larger scale; Fira Code carries the dense reading surface without the fatiguing texture of the previous pairing on non-retina displays. No other typefaces are used in the app.
 
 ### Hierarchy
-- **Display** (Zain, Bold 700, to be sized): Document h1 only. Maximum emphasis.
-- **Headline** (Zain, Regular 400, to be sized): Document h2–h3. Section breaks.
-- **Title** (Nunito, Semi-bold 600, to be sized): Modal titles, section headers.
-- **Body** (Nunito, Regular 400, to be sized): Document prose, annotation comments. Max 65–75ch line length.
-- **Label** (Nunito, Medium 500, to be sized): Block type badges, line numbers, toolbar labels. Possibly uppercase.
-- **Mono** (SUSE Mono, Medium 500 / Bold 700, to be sized): Code blocks, inline code.
+- **Display** (Inconsolata, Bold 700, fixed rem scale): Document h1 only. Larger than body on desktop, sharing the same physical text rail.
+- **Headline** (Inconsolata, Medium 500, fixed rem scale): Document h2-h3 and major section breaks.
+- **Title** (Inconsolata, Bold 700): Modal titles and major UI section headers.
+- **Body** (Fira Code, Regular 400): Document prose, annotation comments, controls, and modal body copy. Desktop document prose uses a viewport-based rail, about 70vw, so headings and body share the same physical width regardless of font size.
+- **Label** (Fira Code, Medium 500 / Semi-bold 600): Block type badges, line numbers, toolbar labels, and compact metadata.
+- **Code** (Fira Code, Regular 400 / Medium 500): Code blocks and inline code.
 
 ### Named Rules
-**The Display Heading Rule.** Zain appears only in rendered markdown headings (h1–h3). All UI chrome — buttons, labels, metadata, toolbar, body text — uses Nunito. Code blocks and inline code use SUSE Mono exclusively.
+**The Two-Font Rule.** Inconsolata is for titles and headings. Fira Code is for body, UI, metadata, annotations, inline code, and code blocks. Do not introduce a third family.
 
-**The Mono-For-Code Rule.** SUSE Mono is strictly for code. Never apply it to headings, labels, buttons, or data. It belongs in `<code>` and `<pre>` only.
+**The Calm Mono Rule.** Body text stays at readable fixed rem sizes with generous line-height. Desktop markdown prose and h1-h3 headings share a physical text rail of about 70vw, capped by the visible document area so it does not run under the sidebar. The outer document rail is the text rail plus horizontal padding; tables and code blocks may use that full wider rail.
 
 ## 4. Elevation
 
@@ -112,15 +118,15 @@ Key components anticipated:
 ### Do:
 - **Do** keep the markdown document as the dominant visual element. Chrome should frame, not compete.
 - **Do** use the accent color only for annotations and primary actions. Its scarcity makes it meaningful.
-- **Do** use Zain only for document headings. All UI chrome uses Nunito.
-- **Do** use SUSE Mono only for code blocks and inline code.
+- **Do** use Inconsolata for document headings and major titles.
+- **Do** use Fira Code for body text, UI chrome, annotations, inline code, and code blocks.
 - **Do** use tonal layering instead of shadows for depth. Surface vs. surface-raised is enough.
 - **Do** keep transitions fast (150–250ms). Users are in flow; don't make them wait.
 
 ### Don't:
 - **Don't** use generic SaaS dashboard patterns: card grids, gradient text, cream backgrounds, feature walls. Don't default to the warm-red/orange terminal palette either — this brand lives in amethyst and violet.
-- **Don't** apply SUSE Mono to headings, UI labels, buttons, or data. It belongs in code blocks only.
-- **Don't** apply Zain to body text or UI chrome. It's a display font for headings only.
+- **Don't** introduce a third font family.
+- **Don't** stretch body prose to the full viewport; give prose its own measure and let tables and code use the wider rail.
 - **Don't** decorate with motion. Transitions convey state changes; nothing else.
 - **Don't** use `border-left` or `border-right` as colored accent stripes on blocks. Use background tints or the accent overlay instead.
 - **Don't** ship with unreadable muted text. All text must hit ≥4.5:1 contrast against its background.

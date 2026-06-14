@@ -7,54 +7,47 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Epunda+Sans:wght@400;500;600&family=Epunda+Slab:wght@400;700&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inconsolata:wght@500;700&display=swap" />
   <style>
     /* ------------------------------------------------------------------ */
     /* Tokens                                                              */
     /* ------------------------------------------------------------------ */
     :root {
-      --violet-twilight: oklch(0.481 0.194 289.55);
+      --violet-twilight: oklch(0.70 0.16 292);
       --dark-amethyst: oklch(0.223 0.090 318.94);
       --violet-tint: oklch(0.72 0.14 295);
-      --surface: oklch(0.08 0.000 0);
-      --surface-raised: oklch(0.14 0.000 0);
-      --text-primary: oklch(0.94 0.008 300);
+      --surface: oklch(0.20 0.012 268);
+      --surface-raised: oklch(0.26 0.015 268);
+      --surface-chrome: oklch(0.155 0.018 286);
+      --chrome-shadow: oklch(0.10 0.018 286 / 0.14);
+      --chrome-shadow-strong: oklch(0.10 0.018 286 / 0.18);
+      --text-primary: oklch(0.85 0.008 300);
       --text-muted: oklch(0.62 0.01 300);
-      --border: oklch(0.20 0.03 310);
+      --border: oklch(0.34 0.02 270);
       --danger: oklch(0.62 0.18 25);
       --warning: oklch(0.72 0.16 85);
       --success: oklch(0.68 0.15 145);
 
-      --font-mono: "SUSE Mono", ui-monospace, SFMono-Regular, monospace;
-      --font-display: "Epunda Slab", serif;
-      --font-sans: "Epunda Sans", system-ui, sans-serif;
+      --font-title: "Inconsolata", ui-monospace, SFMono-Regular, monospace;
+      --font-body: "Fira Code", ui-monospace, SFMono-Regular, monospace;
+      --font-mono: var(--font-body);
+      --font-display: var(--font-title);
+      --font-sans: var(--font-body);
 
       --transition-fast: 150ms ease-out;
       --transition-med: 200ms ease-out;
 
       --toolbar-h: 48px;
       --sidebar-w: 320px;
+      --doc-text-w: 70vw;
+      --doc-pad-x: clamp(24px, 4vw, 72px);
+      --doc-wide-w: calc(var(--doc-text-w) + var(--doc-pad-x) + var(--doc-pad-x));
       --radius: 6px;
     }
 
     /* ------------------------------------------------------------------ */
-    /* Fonts — SUSE Mono (self-hosted, code blocks only)                   */
-    /* Unbounded + Albert Sans loaded via Google Fonts (display=swap)      */
+    /* Fonts — Inconsolata for titles, Fira Code for body/code             */
     /* ------------------------------------------------------------------ */
-    @font-face {
-      font-family: "SUSE Mono";
-      font-style: normal;
-      font-weight: 500;
-      font-display: swap;
-      src: url("/static/fonts/SUSEMono-Medium.woff2") format("woff2");
-    }
-    @font-face {
-      font-family: "SUSE Mono";
-      font-style: normal;
-      font-weight: 700;
-      font-display: swap;
-      src: url("/static/fonts/SUSEMono-Bold.woff2") format("woff2");
-    }
 
     /* ------------------------------------------------------------------ */
     /* Reset + base                                                        */
@@ -109,8 +102,9 @@
       align-items: center;
       justify-content: space-between;
       padding: 0 16px;
-      background: var(--surface-raised);
-      border-bottom: 1px solid var(--border);
+      background: var(--surface-chrome);
+      border-bottom: none;
+      box-shadow: 0 16px 34px var(--chrome-shadow);
       font-family: var(--font-sans);
       font-size: 13px;
     }
@@ -176,12 +170,12 @@
     .toolbar-btn--primary {
       background: var(--violet-twilight);
       border-color: var(--violet-twilight);
-      color: var(--text-primary);
+      color: var(--surface);
     }
 
     .toolbar-btn--primary:hover {
-      background: oklch(0.52 0.21 289.55);
-      border-color: oklch(0.52 0.21 289.55);
+      background: oklch(0.76 0.15 292);
+      border-color: oklch(0.76 0.15 292);
     }
 
     .toolbar-btn--icon {
@@ -216,27 +210,32 @@
     }
 
     #doc {
-      width: min(100%, 72ch);
-      max-width: 72ch;
+      width: min(100%, var(--doc-wide-w));
+      max-width: var(--doc-wide-w);
       margin: 0 auto;
-      padding: 40px 24px 80px;
+      padding: 42px var(--doc-pad-x) 88px;
       overflow-wrap: break-word;
+      font-size: 1rem;
+      line-height: 1.68;
     }
 
-    /* Document content typography — Unbounded for headings */
+    #doc > :where(h1, h2, h3, p, ul, ol, blockquote, hr) {
+      max-width: min(100%, var(--doc-text-w));
+    }
+
+    /* Document content typography */
     #doc h1, #doc h2, #doc h3 {
       font-family: var(--font-display);
       font-weight: 700;
-      line-height: 1.2;
-      text-wrap: balance;
+      line-height: 1.36;
       overflow-wrap: anywhere;
     }
     #doc h2, #doc h3 {
-      font-weight: 400;
+      font-weight: 500;
     }
-    #doc h1 { font-size: 2.4rem; margin-top: 1.25em; margin-bottom: 0.5em; }
-    #doc h2 { font-size: 1.8rem; margin-top: 1.75em; margin-bottom: 0.5em; }
-    #doc h3 { font-size: 1.4rem; margin-top: 1.5em; margin-bottom: 0.5em; }
+    #doc h1 { font-size: 1.65rem; margin-top: 1.3em; margin-bottom: 0.65em; }
+    #doc h2 { font-size: 1.24rem; margin-top: 1.85em; margin-bottom: 0.65em; }
+    #doc h3 { font-size: 1.08rem; margin-top: 1.55em; margin-bottom: 0.55em; }
     #doc p { margin-bottom: 1em; text-wrap: pretty; }
     #doc pre {
       background: oklch(0.26 0.02 300);
@@ -261,9 +260,11 @@
       overflow-wrap: anywhere;
     }
     #doc blockquote {
-      border-left: 2px solid var(--border);
-      padding-left: 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 16px;
       margin: 1em 0;
+      background: oklch(0.115 0.012 300);
       color: var(--text-muted);
     }
     #doc table {
@@ -324,8 +325,8 @@
     }
 
     #doc [data-block-id].annotated {
-      background: oklch(0.17 0.08 300);
-      border: 1px solid oklch(0.28 0.12 300);
+      background: oklch(0.3 0.08 300);
+      border: none;
       border-radius: 4px;
     }
 
@@ -385,15 +386,16 @@
       bottom: 0;
       width: 0;
       overflow: hidden;
-      background: var(--surface-raised);
-      border-left: 1px solid transparent;
-      transition: width var(--transition-med), border-color var(--transition-med);
+      background: var(--surface-chrome);
+      border-left: none;
+      box-shadow: -18px 0 42px oklch(0.10 0.018 286 / 0);
+      transition: width var(--transition-med), box-shadow var(--transition-med);
       z-index: 80;
     }
 
     #sidebar.open {
       width: var(--sidebar-w);
-      border-left-color: var(--border);
+      box-shadow: -18px 0 42px var(--chrome-shadow-strong);
     }
 
     #sidebar-inner {
@@ -793,12 +795,12 @@
     .modal-btn--primary {
       background: var(--violet-twilight);
       border-color: var(--violet-twilight);
-      color: var(--text-primary);
+      color: var(--surface);
     }
 
     .modal-btn--primary:hover {
-      background: oklch(0.52 0.21 289.55);
-      border-color: oklch(0.52 0.21 289.55);
+      background: oklch(0.76 0.15 292);
+      border-color: oklch(0.76 0.15 292);
     }
 
     .modal-btn--danger {
@@ -932,7 +934,7 @@
       display: grid;
       place-items: center;
       background:
-        radial-gradient(circle at center, oklch(0.481 0.194 289.55 / 0.34), transparent 66%),
+        radial-gradient(circle at center, oklch(0.70 0.16 292 / 0.34), transparent 66%),
         var(--dark-amethyst);
       color: var(--text-primary);
       animation: terminal-arrive 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -1463,13 +1465,15 @@
         width: 100%;
         max-width: min(100%, 66ch);
         padding: 28px 18px 104px;
-        font-size: 17px;
+        font-size: 1rem;
         line-height: 1.65;
       }
 
-      #doc h1 { font-size: 2rem; }
-      #doc h2 { font-size: 1.55rem; }
-      #doc h3 { font-size: 1.28rem; }
+      #doc h1,
+      #doc h2,
+      #doc h3 {
+        font-size: 1rem;
+      }
 
       #doc pre {
         padding: 14px;
@@ -1537,10 +1541,10 @@
         height: min(78dvh, 560px);
         transform: translateY(calc(100% + 32px));
         border-left: none;
-        border-top: 1px solid var(--border);
+        border-top: none;
         border-radius: 14px 14px 0 0;
-        box-shadow: 0 -18px 48px oklch(0.025 0.012 300 / 0.68);
-        transition: transform var(--transition-med), border-color var(--transition-med);
+        box-shadow: 0 -18px 48px oklch(0.08 0.018 286 / 0.48);
+        transition: transform var(--transition-med), box-shadow var(--transition-med);
       }
 
       #sidebar.open {
@@ -1548,7 +1552,6 @@
         width: 100%;
         max-width: none;
         transform: translateY(0);
-        border-top-color: var(--border);
       }
 
       #sidebar::before {
