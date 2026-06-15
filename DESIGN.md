@@ -40,7 +40,7 @@ typography:
 
 **Creative North Star: "The Annotated Terminal"**
 
-A developer tool that borrows the authority of a terminal and the clarity of a typeset document. The interface is dark, high-contrast, and unapologetically focused on the markdown content. Violet and amethyst accents mark annotations and primary actions: sparse, deliberate, never decorative. IBM Plex Sans Condensed carries document headings with a compact technical voice, IBM Plex Serif handles body text and UI chrome with editorial warmth, and MesloLGM Nerd Font Mono Regular keeps inline code and code blocks terminal-native.
+A developer tool that borrows the authority of a terminal and the clarity of a typeset document. The interface is dark, high-contrast, and unapologetically focused on the markdown content. Violet and amethyst accents mark annotations and primary actions: sparse, deliberate, never decorative. IBM Plex Sans Condensed carries document headings with a compact technical voice, IBM Plex Sans handles body text and UI chrome with clean legibility, and MesloLGM Nerd Font Mono Regular keeps inline code and code blocks terminal-native.
 
 This explicitly rejects generic SaaS dashboard aesthetics: no card grids, no gradient text, no cream backgrounds, no feature walls. This is a single-purpose tool for people who read and write markdown for a living.
 
@@ -81,7 +81,7 @@ This explicitly rejects generic SaaS dashboard aesthetics: no card grids, no gra
 ## 3. Typography
 
 **Display Font:** IBM Plex Sans Condensed: document headings (h1-h3), modal titles, and strong section labels.
-**Body / UI Font:** IBM Serif: document prose, labels, buttons, metadata, and annotation comments.
+**Body / UI Font:** IBM Plex Sans: document prose, labels, buttons, metadata, and annotation comments.
 **Code Font:** MesloLGM Nerd Font Mono Regular: inline code, code blocks, and `<pre>` content.
 
 **Character:** Three-role system with clear separation of purpose. IBM Plex Sans Condensed gives headings a compact technical voice, IBM Plex Sans makes body and UI text clean and legible, and MesloLGM Nerd Font Mono Regular preserves the familiar terminal texture where code appears. No other typefaces are used in the app.
