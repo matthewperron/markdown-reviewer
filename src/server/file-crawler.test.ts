@@ -2,6 +2,7 @@ import { describe, test, expect, beforeEach, afterEach } from "bun:test";
 import { mkdir, writeFile, rm } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import { realpath } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { autoDiscover, type ManifestRef } from "./file-crawler";
 import { createMutex } from "./manifest-mutex";
 import {
@@ -57,7 +58,7 @@ describe("autoDiscover", () => {
   let tmpDir: string;
 
   beforeEach(async () => {
-    tmpDir = join("/tmp", `mdr-crawler-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    tmpDir = join(tmpdir(), `mdr-crawler-${Date.now()}-${Math.random().toString(36).slice(2)}`);
     await mkdir(tmpDir, { recursive: true });
   });
 
@@ -304,7 +305,7 @@ describe("server --auto-discover", () => {
   }
 
   beforeEach(async () => {
-    tmpDir = join("/tmp", `mdr-server-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    tmpDir = join(tmpdir(), `mdr-server-${Date.now()}-${Math.random().toString(36).slice(2)}`);
     await mkdir(tmpDir, { recursive: true });
   });
 

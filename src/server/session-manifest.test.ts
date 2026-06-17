@@ -1,6 +1,7 @@
 import { describe, test, expect, beforeEach, afterEach } from "bun:test";
 import { mkdir, writeFile, rm, readdir, readFile, access } from "node:fs/promises";
 import { join } from "node:path";
+import { tmpdir } from "node:os";
 import {
   cleanupFile,
   loadOrCreateSessionManifest,
@@ -29,7 +30,7 @@ function createTestFile(name: string, content = "# Test"): string {
 
 beforeEach(async () => {
   tmpDir = join(
-    "/tmp",
+    tmpdir(),
     `mdr-session-test-${Date.now()}-${Math.random().toString(36).slice(2)}`
   );
   fileDir = join(tmpDir, "files");

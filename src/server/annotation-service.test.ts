@@ -1,6 +1,7 @@
 import { describe, test, expect, beforeEach, afterEach } from "bun:test";
 import { mkdir, writeFile, rm, readdir, access } from "node:fs/promises";
 import { join } from "node:path";
+import { tmpdir } from "node:os";
 import {
   openSession,
   SessionLockedError,
@@ -31,7 +32,7 @@ function makeAnnotation(overrides: Partial<Annotation> = {}): Annotation {
 
 beforeEach(async () => {
   // Create a unique temp dir for each test
-  tmpDir = join("/tmp", `mdr-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+  tmpDir = join(tmpdir(), `mdr-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
   await mkdir(tmpDir, { recursive: true });
 });
 

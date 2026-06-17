@@ -8,6 +8,7 @@ import remarkRehype from "remark-rehype";
 import { toHtml } from "hast-util-to-html";
 import { mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { join, dirname } from "node:path";
+import { tmpdir } from "node:os";
 import { realpath } from "node:fs/promises";
 
 describe("parseDocument", () => {
@@ -264,7 +265,7 @@ describe("link detection", () => {
   let sessionRoot: string;
 
   beforeEach(() => {
-    testRoot = join("/tmp", "md-link-test-" + Date.now());
+    testRoot = join(tmpdir(), "md-link-test-" + Date.now());
     sessionRoot = testRoot;
 
     // Create directory structure
