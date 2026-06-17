@@ -100,6 +100,15 @@ irm https://bun.sh/install.ps1 | iex
 winget install oven-sh.Bun
 ```
 
+**Make sure Bun's global bin is on your `PATH`:**
+
+- **Unix:** `echo 'export PATH="$HOME/.bun/bin:$PATH"' >> ~/.bashrc` (or `~/.zshrc`)
+- **Windows (PowerShell):** Add to your profile (`notepad $PROFILE`):
+  ```powershell
+  $env:PATH += ";$env:USERPROFILE\.bun\bin"
+  ```
+  Then restart your terminal.
+
 ```sh
 git clone <repo>
 cd markdown-reviewer
@@ -121,15 +130,6 @@ mdr path/to/doc.md
 ```
 
 `bun link` creates a symlink to your project source. Because Bun runs `.ts` files directly (no build step), code changes are picked up immediately — you only need to re-run `bun link` if `package.json` itself changes.
-
-**Make sure Bun's global bin is on your `PATH`:**
-
-- **Unix:** `echo 'export PATH="$HOME/.bun/bin:$PATH"' >> ~/.bashrc` (or `~/.zshrc`)
-- **Windows (PowerShell):** Add to your profile (`notepad $PROFILE`):
-  ```powershell
-  $env:PATH += ";$env:USERPROFILE\.bun\bin"
-  ```
-  Then restart your terminal.
 
 ## Development
 
