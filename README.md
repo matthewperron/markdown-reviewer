@@ -112,21 +112,24 @@ Run against a file:
 bun run start path/to/doc.md
 ```
 
-Or install globally. `bun install -g .` is [broken](https://github.com/oven-sh/bun/issues) — use one of these instead:
-
-**Option 1:** `bun link` (re-run after code changes to update the binary)
+Or install globally with `bun link`:
 
 ```sh
+cd markdown-reviewer
 bun link
 mdr path/to/doc.md
 ```
 
-**Option 2:** `bun install -g` with an absolute path
+`bun link` creates a symlink to your project source. Because Bun runs `.ts` files directly (no build step), code changes are picked up immediately — you only need to re-run `bun link` if `package.json` itself changes.
 
-```sh
-bun install -g /path/to/markdown-reviewer
-mdr path/to/doc.md
-```
+**Make sure Bun's global bin is on your `PATH`:**
+
+- **Unix:** `echo 'export PATH="$HOME/.bun/bin:$PATH"' >> ~/.bashrc` (or `~/.zshrc`)
+- **Windows (PowerShell):** Add to your profile (`notepad $PROFILE`):
+  ```powershell
+  $env:PATH += ";$env:USERPROFILE\.bun\bin"
+  ```
+  Then restart your terminal.
 
 ## Development
 
