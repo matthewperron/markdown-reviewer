@@ -59,6 +59,8 @@ Annotations persist as JSON files and **auto-resume** on re-run. Blocks are matc
 
 ## Server API
 
+### Single-file (backward-compatible)
+
 | Method | Path | Response |
 |--------|------|----------|
 | `GET` | `/api/markdown` | `{ source, blocks }` |
@@ -66,6 +68,27 @@ Annotations persist as JSON files and **auto-resume** on re-run. Blocks are matc
 | `POST` | `/api/annotations` | `{ annotation }` (201 create / 200 update) |
 | `DELETE` | `/api/annotations/:id` | `{ ok }` or 404 |
 | `POST` | `/api/done` | `{ ok, path }` or `{ ok: false, error }` |
+
+### Multi-file
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/files` | List loaded files + active key |
+| `GET` | `/api/session-files` | Manifest-backed session file list |
+| `GET` | `/api/files/:key` | Load file on-demand |
+| `GET` | `/api/files/:key/annotations` | File-scoped annotations |
+| `POST` | `/api/files/:key/annotations` | Create/update annotation |
+| `DELETE` | `/api/files/:key/annotations/:id` | Remove annotation |
+| `GET` | `/api/reviewed-files` | Files with annotations |
+| `GET` | `/api/ping` | Heartbeat ping |
+
+### Static
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/` | Prerendered HTML page |
+| `GET` | `/app.js` | Frontend JavaScript |
+| `GET` | `/static/*` | Static assets from `public/` |
 
 ## Output format
 
@@ -137,6 +160,50 @@ mdr path/to/doc.md
 ```
 
 `bun link` creates a symlink to your project source. Because Bun runs `.ts` files directly (no build step), code changes are picked up immediately — you only need to re-run `bun link` if `package.json` itself changes.
+
+## Run over LAN
+
+To access `mdr` from another machine on your network (e.g. a remote server), set the default port
+and enable LAN mode via the config file, then open a firewall rule.
+
+**1. Create the config file:**
+
+**Unix (macOS / Linux):**
+
+```bash
+mkdir -p ~/.config/mdr
+cat > ~/.config/mdr/config.env << 'EOF'
+MDR_LAN=1
+MDR_PORT=11111
+EOF
+```
+
+**Windows:**
+
+```powershell
+mkdir -Force "$env:APPDATA\markdown-review"
+Set-Content -Path "$env:APPDATA\markdown-review\config.env" -Value "MDR_LAN=1`nMDR_PORT=11111"
+```
+
+**2. Add a firewall rule:**
+
+**Unix (macOS / Linux — requires root):**
+
+```bash
+# Linux (ufw)
+sudo ufw allow 11111/tcp
+# macOS (pf — add to /etc/pf.anchors/mdr and load)
+sudo echo 'pass in on en0 proto tcp to port 11111' >> /etc/pf.anchors/mdr
+sudo pfctl -a mdr -f /etc/pf.anchors/mdr
+```
+
+**Windows (PowerShell — requires admin):**
+
+```powershell
+New-NetFirewallRule -DisplayName 'markdown-reviewer (mdr)' -Direction Inbound -LocalPort 11111 -Protocol TCP -Action Allow
+```
+
+**3. Run `mdr`** — it will bind to `0.0.0.0:11111` and print the LAN URL. Open it from any device on your network.
 
 ## Development
 
