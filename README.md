@@ -90,8 +90,8 @@ curl -fsSL https://bun.sh/install | bash
 
 **Windows (PowerShell):**
 
-```bash
-powershell -c "irm https://bun.sh/install.ps1 | iex"
+```powershell
+irm https://bun.sh/install.ps1 | iex
 ```
 
 **Windows (winget):**
