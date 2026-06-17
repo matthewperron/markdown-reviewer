@@ -1,10 +1,10 @@
 # markdown-reviewer (`mdr`)
 
-A browser-based markdown annotation tool. Open a `.md` file, click blocks to add comments, hit **Done**, and get a `_reviewed.md` file with inline review markers — structured feedback an LLM agent can read and act on.
+A browser-based markdown annotation tool. Open a `.md` file, click blocks to add comments, hit **Done**, and get a `.mdr` file with inline review markers — structured feedback an LLM agent can read and act on.
 
 ```
 mdr proposal.md
-→ browser opens → click blocks → add comments → Done → proposal_reviewed.md
+→ browser opens → click blocks → add comments → Done → proposal.mdr
 ```
 
 ## Usage
@@ -53,9 +53,9 @@ ignored with a warning.
 1. **CLI** — `mdr file.md` starts a local Bun HTTP server and opens your browser.
 2. **Server** — Parses the markdown into annotatable blocks (headings, paragraphs, list items, code blocks, blockquotes, table cells) and serves a single-page view.
 3. **Browser** — Click any block to add or edit a comment. The sidebar shows all active and orphaned annotations.
-4. **Done** — The server generates `file_reviewed.md` alongside the original, confirms success to the browser, then shuts down.
+4. **Done** — The server regenerates all `.mdr` files and shows a terminal with the reviewed file paths. The server stays alive and shuts down after 30 minutes without a browser heartbeat.
 
-Annotations persist as JSON files and **auto-resume** on re-run. Blocks are matched by content hash (not line numbers), so annotations survive reordering and unrelated edits.
+Annotations persist as JSON files and **auto-resume** on re-run. Blocks are matched by content hash (not line numbers), so annotations survive reordering and unrelated edits. `.mdr` files are regenerated after every annotation save or delete — they always reflect the current state.
 
 ## Server API
 
@@ -69,11 +69,12 @@ Annotations persist as JSON files and **auto-resume** on re-run. Blocks are matc
 
 ## Output format
 
-The `_reviewed.md` file contains:
+Each annotated file generates a `.mdr` file alongside the original (e.g., `spec.md` → `spec.mdr`). The `.mdr` file contains:
 
-1. **Summary section** — numbered annotations with block type, line range, and comment text. Orphaned annotations (blocks that were deleted) are listed separately.
-2. **Thematic break** separator.
-3. **Full original source** with inline `<!-- Review: [N] comment -->` markers spliced at each annotated block's position.
+1. **AGENT PROTOCOL block** — an HTML comment at the top with authoritative instructions for an agent applying the review (triage, consistency, preservation rules, cleanup).
+2. **Summary section** — numbered annotations with block type, line range, and comment text. Orphaned annotations (blocks that were deleted) are listed separately.
+3. **Thematic break** separator.
+4. **Full original source** with inline `<!-- Review: [N] comment -->` markers spliced at each annotated block's position.
 
 The original formatting is preserved byte-for-byte — markers are inserted into the source string, never re-serialized from an AST.
 
@@ -127,24 +128,35 @@ bun test                      # run tests
 
 ```
 src/
-├── cli/index.ts                # CLI entry point
+├── cli/
+│   └── index.ts                # CLI entry: arg parsing, server launch, signal handling, LAN/QR
 ├── frontend/
-│   ├── app.js                  # Frontend (vanilla JS, no build step)
-│   └── page.html               # HTML page template
+│   ├── app.js                  # vanilla JS frontend (IIFE, no build step)
+│   └── page.html               # server-rendered HTML page template
 ├── review/
-│   ├── generator.ts            # Review file generator
+│   ├── generator.ts            # review generator: AGENT PROTOCOL + summary + inline marker splicing
 │   └── generator.test.ts
 ├── server/
-│   ├── index.ts                # HTTP server + API routes
+│   ├── index.ts                # Bun HTTP server, all API routes, static serving, heartbeat
 │   ├── index.test.ts
-│   ├── markdown-service.ts     # Markdown parsing (remark pipeline)
+│   ├── integration-routes.test.ts  # integration tests for multi-file routes
+│   ├── markdown-service.ts     # parseDocument / loadDocument (remark pipeline + link detection)
 │   ├── markdown-service.test.ts
-│   ├── anchoring.ts            # Block anchoring + relocation
+│   ├── anchoring.ts            # computeAnchor, relocate (four-tier matcher), serializeAnchor
 │   ├── anchoring.test.ts
-│   ├── annotation-service.ts   # JSON persistence + session lock
-│   └── annotation-service.test.ts
-└── shared/
-    └── types.ts                # Shared TypeScript types
+│   ├── annotation-service.ts   # JSON file persistence, session lock (PID-based), CRUD
+│   ├── annotation-service.test.ts
+│   ├── file-store.ts           # in-memory registry of loaded files (FileStore class)
+│   ├── file-crawler.ts         # cycle-safe BFS auto-discover of relative .md link graph
+│   ├── file-crawler.test.ts
+│   ├── session-manifest.ts     # session manifest CRUD, .session/.path markers, session merge
+│   ├── session-manifest.test.ts
+│   ├── manifest-mutex.ts       # async FIFO mutex to serialize manifest read-modify-write
+│   └── manifest-mutex.test.ts
+├── shared/
+│   └── types.ts                # BlockAnchor, BlockNode, Annotation, AnnotationStatus, FileKey, MdLink
+└── types/
+    └── qrcode-terminal.d.ts    # type declaration for qrcode-terminal
 ```
 
 ## Agent harness integrations
