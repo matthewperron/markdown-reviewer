@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach, afterEach } from "bun:test";
-import { mkdir, writeFile, rm, readdir, readFile, access } from "node:fs/promises";
+import { mkdir, writeFile, rm, readdir, readFile, access, realpath } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import {
@@ -21,11 +21,13 @@ import { sessionDir } from "./annotation-service";
 let tmpDir: string;
 let fileDir: string;
 
-function createTestFile(name: string, content = "# Test"): string {
+async function createTestFile(name: string, content = "# Test"): Promise<string> {
   const path = join(fileDir, name);
   // We create the file synchronously for test setup
   Bun.write(path, content);
-  return path;
+  // Return realpath-normalized path so cleanupFile (which uses realpath internally)
+  // can find the session marker written during loadOrCreateSessionManifest
+  return realpath(path);
 }
 
 beforeEach(async () => {
@@ -51,7 +53,7 @@ afterEach(async () => {
 
 describe("loadOrCreateSessionManifest", () => {
   test("creates a new manifest for a file with no existing session", async () => {
-    const filePath = createTestFile("doc.md");
+    const filePath = await createTestFile("doc.md");
 
     const manifest = await loadOrCreateSessionManifest(filePath, tmpDir);
 
@@ -72,7 +74,7 @@ describe("loadOrCreateSessionManifest", () => {
   });
 
   test("loads existing manifest from .session marker", async () => {
-    const filePath = createTestFile("doc.md");
+    const filePath = await createTestFile("doc.md");
 
     // First call creates the manifest
     const manifest1 = await loadOrCreateSessionManifest(filePath, tmpDir);
@@ -95,7 +97,7 @@ describe("loadOrCreateSessionManifest", () => {
 
 describe("recovery", () => {
   test("recovers when .session marker points at a missing manifest", async () => {
-    const filePath = createTestFile("doc.md");
+    const filePath = await createTestFile("doc.md");
 
     // Create a manifest and write the marker
     const manifest = await loadOrCreateSessionManifest(filePath, tmpDir);
@@ -135,7 +137,7 @@ describe("recovery", () => {
   });
 
   test("creates new manifest when recovery finds nothing", async () => {
-    const filePath = createTestFile("doc.md");
+    const filePath = await createTestFile("doc.md");
 
     // Write a stale .session marker pointing at a non-existent manifest
     const dir = sessionDir(filePath, tmpDir);
@@ -161,7 +163,7 @@ describe("recovery", () => {
 
 describe("writeSessionMarkers", () => {
   test("writes .path and .session correctly", async () => {
-    const filePath = createTestFile("doc.md");
+    const filePath = await createTestFile("doc.md");
     const sessionId = "abcdef12";
 
     await writeSessionMarkers(filePath, tmpDir, sessionId);
@@ -177,7 +179,7 @@ describe("writeSessionMarkers", () => {
 
 describe("readSessionMarker", () => {
   test("returns null when no marker exists", async () => {
-    const filePath = createTestFile("doc.md");
+    const filePath = await createTestFile("doc.md");
     const marker = await readSessionMarker(filePath, tmpDir);
     expect(marker).toBeNull();
   });
@@ -189,8 +191,8 @@ describe("readSessionMarker", () => {
 
 describe("addFileToSessionManifest", () => {
   test("adds a new file to the manifest", async () => {
-    const filePath1 = createTestFile("a.md");
-    const filePath2 = createTestFile("b.md");
+    const filePath1 = await createTestFile("a.md");
+    const filePath2 = await createTestFile("b.md");
 
     const manifest = await loadOrCreateSessionManifest(filePath1, tmpDir);
     expect(manifest.files).toHaveLength(1);
@@ -206,7 +208,7 @@ describe("addFileToSessionManifest", () => {
   });
 
   test("updates timestamps for existing file", async () => {
-    const filePath = createTestFile("doc.md");
+    const filePath = await createTestFile("doc.md");
 
     const manifest = await loadOrCreateSessionManifest(filePath, tmpDir);
     const originalLastLoadedAt = manifest.files[0].lastLoadedAt;
@@ -226,8 +228,8 @@ describe("addFileToSessionManifest", () => {
 
 describe("discoverSessionFiles", () => {
   test("reads only manifest files", async () => {
-    const filePath1 = createTestFile("a.md");
-    const filePath2 = createTestFile("b.md");
+    const filePath1 = await createTestFile("a.md");
+    const filePath2 = await createTestFile("b.md");
 
     const manifest = await loadOrCreateSessionManifest(filePath1, tmpDir);
     await addFileToSessionManifest(manifest, filePath2, tmpDir);
@@ -242,8 +244,8 @@ describe("discoverSessionFiles", () => {
   });
 
   test("skips deleted files", async () => {
-    const filePath1 = createTestFile("a.md");
-    const filePath2 = createTestFile("b.md");
+    const filePath1 = await createTestFile("a.md");
+    const filePath2 = await createTestFile("b.md");
 
     const manifest = await loadOrCreateSessionManifest(filePath1, tmpDir);
     await addFileToSessionManifest(manifest, filePath2, tmpDir);
@@ -263,8 +265,8 @@ describe("discoverSessionFiles", () => {
 
 describe("mergeSessions", () => {
   test("merges two sessions, older survives", async () => {
-    const filePathA = createTestFile("a.md");
-    const filePathB = createTestFile("b.md");
+    const filePathA = await createTestFile("a.md");
+    const filePathB = await createTestFile("b.md");
 
     // Create older session with A
     const now1 = Date.now();
@@ -326,8 +328,8 @@ describe("mergeSessions", () => {
   });
 
   test("merge is order-independent", async () => {
-    const filePathA = createTestFile("a.md");
-    const filePathB = createTestFile("b.md");
+    const filePathA = await createTestFile("a.md");
+    const filePathB = await createTestFile("b.md");
 
     const now1 = Date.now();
     const manifestA: SessionManifest = {
@@ -369,7 +371,7 @@ describe("mergeSessions", () => {
   });
 
   test("throws when a manifest is missing", async () => {
-    const filePath = createTestFile("a.md");
+    const filePath = await createTestFile("a.md");
 
     const now = Date.now();
     const manifest: SessionManifest = {
@@ -397,8 +399,10 @@ describe("mergeSessions", () => {
 describe("six-file merge", () => {
   test("session {A,B,C} (older) + {D,E,F} (younger) → one manifest with all six", async () => {
     // Create 6 test files
-    const files = ["a.md", "b.md", "c.md", "d.md", "e.md", "f.md"].map(
-      (name) => createTestFile(name)
+    const files = await Promise.all(
+      ["a.md", "b.md", "c.md", "d.md", "e.md", "f.md"].map(
+        (name) => createTestFile(name)
+      )
     );
 
     // Create older session {A, B, C}
@@ -477,7 +481,7 @@ describe("six-file merge", () => {
 
 describe("fresh mode", () => {
   test("creates new manifest and removes from old", async () => {
-    const filePath = createTestFile("doc.md");
+    const filePath = await createTestFile("doc.md");
 
     // Create an existing manifest with this file
     const now1 = Date.now();
@@ -572,7 +576,7 @@ describe("generateShortId", () => {
 
 describe("saveSessionManifest", () => {
   test("saves manifest atomically (no .tmp residue)", async () => {
-    const filePath = createTestFile("doc.md");
+    const filePath = await createTestFile("doc.md");
     const now = Date.now();
     const manifest: SessionManifest = {
       id: "test1234",
@@ -605,7 +609,7 @@ describe("saveSessionManifest", () => {
 
 describe("cleanupFile", () => {
   test("removes .mdr file, annotation directory, and manifest entry", async () => {
-    const filePath = createTestFile("doc.md");
+    const filePath = await createTestFile("doc.md");
     const mdrPath = filePath.replace(/\.md$/, ".mdr");
 
     // Create a session with the file
@@ -638,8 +642,8 @@ describe("cleanupFile", () => {
   });
 
   test("keeps manifest when other files remain after cleanup", async () => {
-    const fileA = createTestFile("a.md");
-    const fileB = createTestFile("b.md");
+    const fileA = await createTestFile("a.md");
+    const fileB = await createTestFile("b.md");
 
     // Create session with file A
     const manifestA = await loadOrCreateSessionManifest(fileA, tmpDir);
@@ -669,7 +673,7 @@ describe("cleanupFile", () => {
   });
 
   test("is idempotent — safe to call when no session or .mdr exists", async () => {
-    const filePath = createTestFile("nope.md");
+    const filePath = await createTestFile("nope.md");
 
     // Should not throw even though there's no session data or .mdr
     await expect(cleanupFile(filePath, tmpDir)).resolves.toBeUndefined();
@@ -677,7 +681,7 @@ describe("cleanupFile", () => {
   });
 
   test("realpath normalization — cleanup resolves path before lookup", async () => {
-    const filePath = createTestFile("NormFile.md");
+    const filePath = await createTestFile("NormFile.md");
     const mdrPath = filePath.replace(/\.md$/i, ".mdr");
 
     // Create a session (stores realpath-normalized path)
