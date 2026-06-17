@@ -1,5 +1,5 @@
-import { mkdir, rm, readdir, readFile, writeFile, rename, access } from "node:fs/promises";
-import { join, dirname } from "node:path";
+import { mkdir, rm, readdir, readFile, writeFile, rename, access, realpath } from "node:fs/promises";
+import { join, dirname, resolve as resolvePath } from "node:path";
 import { sessionDir } from "./annotation-service";
 
 // ---------------------------------------------------------------------------
@@ -358,15 +358,21 @@ export async function cleanupFile(
   filePath: string,
   tmpDir: string
 ): Promise<void> {
+  // Normalize with realpath for cross-platform case-insensitive matching
+  // (e.g. "readme.md" vs "README.md" on Windows)
+  const resolvedPath = await realpath(resolvePath(filePath)).catch(
+    () => resolvePath(filePath)
+  );
+
   // Read session marker BEFORE deleting the annotation directory
-  const sessionId = await readSessionMarker(filePath, tmpDir).catch(() => null);
+  const sessionId = await readSessionMarker(resolvedPath, tmpDir).catch(() => null);
 
   // Delete the .mdr output file
-  const mdrPath = filePath.replace(/\.md$/i, ".mdr");
+  const mdrPath = resolvedPath.replace(/\.md$/i, ".mdr");
   await rm(mdrPath, { force: true });
 
   // Delete annotation directory (annotations, lock, markers)
-  const sessDir = sessionDir(filePath, tmpDir);
+  const sessDir = sessionDir(resolvedPath, tmpDir);
   await rm(sessDir, { recursive: true, force: true });
 
   // If no session was tracked, we're done
@@ -376,8 +382,13 @@ export async function cleanupFile(
   const manifest = await loadManifestDirect(sessionId, tmpDir).catch(() => null);
   if (!manifest) return;
 
-  // Remove the file from the manifest
-  manifest.files = manifest.files.filter((f) => f.filePath !== filePath);
+  // Remove the file from the manifest (case-insensitive on Windows)
+  const isWin = process.platform === "win32";
+  const lowerPath = isWin ? resolvedPath.toLowerCase() : resolvedPath;
+  manifest.files = manifest.files.filter((f) => {
+    const stored = isWin ? f.filePath.toLowerCase() : f.filePath;
+    return stored !== lowerPath;
+  });
   manifest.updatedAt = Date.now();
 
   if (manifest.files.length === 0) {

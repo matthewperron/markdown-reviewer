@@ -675,4 +675,38 @@ describe("cleanupFile", () => {
     await expect(cleanupFile(filePath, tmpDir)).resolves.toBeUndefined();
     await expect(cleanupFile(filePath, tmpDir)).resolves.toBeUndefined();
   });
+
+  test("realpath normalization — cleanup resolves path before lookup", async () => {
+    const filePath = createTestFile("NormFile.md");
+    const mdrPath = filePath.replace(/\.md$/i, ".mdr");
+
+    // Create a session (stores realpath-normalized path)
+    const manifest = await loadOrCreateSessionManifest(filePath, tmpDir);
+    const sessionId = manifest.id;
+
+    // Create .mdr and annotation files
+    await writeFile(mdrPath, "# Review");
+    const sessDir = sessionDir(filePath, tmpDir);
+    await writeFile(join(sessDir, "norm123.json"), JSON.stringify({ id: "norm123" }));
+
+    // On Windows, use a different-case path to exercise case-insensitive matching.
+    // On Unix, realpath of the same path still validates the normalization path.
+    const inputPath = process.platform === "win32"
+      ? filePath.replace("NormFile.md", "normfile.md")
+      : filePath;
+
+    await cleanupFile(inputPath, tmpDir);
+
+    // .mdr should be deleted
+    const mdrExists = await access(mdrPath).then(() => true).catch(() => false);
+    expect(mdrExists).toBe(false);
+
+    // Annotation directory should be deleted
+    const sessDirExists = await access(sessDir).then(() => true).catch(() => false);
+    expect(sessDirExists).toBe(false);
+
+    // Manifest should be deleted (only file)
+    const manifestAfter = await loadManifestDirect(sessionId, tmpDir).catch(() => null);
+    expect(manifestAfter).toBeNull();
+  });
 });
