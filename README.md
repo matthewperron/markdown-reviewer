@@ -82,11 +82,23 @@ The original formatting is preserved byte-for-byte — markers are inserted into
 
 **Prerequisite:** [Bun](https://bun.sh) (v1.0+)
 
-| Platform | Command |
-|----------|---------|
-| macOS / Linux | `curl -fsSL https://bun.sh/install | bash` |
-| Windows (PowerShell) | `powershell -c "irm https://bun.sh/install.ps1 | iex"` |
-| Windows (winget) | `winget install oven-sh.Bun` |
+**macOS / Linux:**
+
+```bash
+curl -fsSL https://bun.sh/install | bash
+```
+
+**Windows (PowerShell):**
+
+```bash
+powershell -c "irm https://bun.sh/install.ps1 | iex"
+```
+
+**Windows (winget):**
+
+```bash
+winget install oven-sh.Bun
+```
 
 ```sh
 git clone <repo>
