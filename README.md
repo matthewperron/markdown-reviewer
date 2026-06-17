@@ -124,11 +124,15 @@ Run against a file:
 bun run start path/to/doc.md
 ```
 
-Or install globally with `bun link`:
+Or install globally — from the project directory, run:
 
-```sh
-cd markdown-reviewer
+```bash
 bun link
+```
+
+After that, `mdr` is available from anywhere:
+
+```bash
 mdr path/to/doc.md
 ```
 
