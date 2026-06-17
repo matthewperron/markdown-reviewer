@@ -146,6 +146,13 @@ bun run typecheck             # TypeScript check
 bun test                      # run tests
 ```
 
+**Optional:** install the pre-commit hook (auto-bumps patch version on each commit):
+
+```sh
+cp scripts/pre-commit.sh .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+```
+
 ## Project structure
 
 ```
