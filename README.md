@@ -30,8 +30,9 @@ as `<name>.mdr`.
 
 ### Configuration file
 
-Set persistent defaults in an env-style file at `~/.config/mdr/config.env` (or
-`$XDG_CONFIG_HOME/mdr/config.env`) so you don't have to retype flags on every run:
+Set persistent defaults in an env-style file so you don't have to retype flags on every run:
+- **Unix:** `~/.config/mdr/config.env` (or `$XDG_CONFIG_HOME/mdr/config.env`)
+- **Windows:** `%APPDATA%/markdown-review/config.env`
 
 ```sh
 # ~/.config/mdr/config.env
@@ -99,6 +100,14 @@ The `_reviewed.md` file contains:
 The original formatting is preserved byte-for-byte — markers are inserted into the source string, never re-serialized from an AST.
 
 ## Install
+
+**Prerequisite:** [Bun](https://bun.sh) (v1.0+)
+
+| Platform | Command |
+|----------|---------|
+| macOS / Linux | `curl -fsSL https://bun.sh/install | bash` |
+| Windows (PowerShell) | `powershell -c "irm https://bun.sh/install.ps1 | iex"` |
+| Windows (winget) | `winget install oven-sh.Bun` |
 
 ```sh
 git clone <repo>
