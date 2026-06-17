@@ -1,6 +1,7 @@
 import { describe, test, expect, beforeEach, afterEach } from "bun:test";
 import { mkdir, writeFile, rm, chmod, readFile } from "node:fs/promises";
 import { join } from "node:path";
+import { tmpdir } from "node:os";
 import { startServer } from "./index";
 import { SessionLockedError } from "./annotation-service";
 import type { RunningServer } from "./index";
@@ -41,7 +42,7 @@ const x = 1;
   }
 
   beforeEach(async () => {
-    tmpDir = join("/tmp", `mdr-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    tmpDir = join(tmpdir(), `mdr-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
     await mkdir(tmpDir, { recursive: true });
     mdPath = join(tmpDir, "test.md");
     await writeFile(mdPath, sampleMd, "utf-8");
@@ -172,7 +173,7 @@ const x = 1;
 
   test("success POST /api/done writes file, server stays up", async () => {
     // Use a fresh tmp dir for this test to avoid stale session data
-    const freshDir = join("/tmp", `mdr-done-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    const freshDir = join(tmpdir(), `mdr-done-${Date.now()}-${Math.random().toString(36).slice(2)}`);
     await mkdir(freshDir, { recursive: true });
     const doneMdPath = join(freshDir, "done.md");
     await writeFile(doneMdPath, "# Done test\n\nSome content.", "utf-8");

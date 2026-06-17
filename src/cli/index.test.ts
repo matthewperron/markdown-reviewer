@@ -199,7 +199,11 @@ describe("CLI config file", () => {
     expect(await loadConfigEnv("/nonexistent/path/to/config.env")).toEqual({});
   });
 
-  test("configEnvPath honors XDG_CONFIG_HOME", () => {
+  test("configEnvPath honors XDG_CONFIG_HOME (Unix only)", () => {
+    if (process.platform === "win32") {
+      // On Windows, configEnvPath uses APPDATA, not XDG_CONFIG_HOME
+      return;
+    }
     clearConfigEnv();
     process.env.XDG_CONFIG_HOME = "/custom/cfg";
     expect(configEnvPath()).toBe("/custom/cfg/mdr/config.env");

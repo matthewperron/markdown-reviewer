@@ -1,10 +1,11 @@
 #!/usr/bin/env bun
 import { resolve, join } from "node:path";
 import { access, constants, rm } from "node:fs/promises";
-import { networkInterfaces, homedir } from "node:os";
+import { networkInterfaces, homedir, tmpdir } from "node:os";
 import qrcode from "qrcode-terminal";
 import { startServer, SessionLockedError } from "../server/index";
 import { cleanupFile } from "../server/session-manifest";
+import pkg from "../../package.json" assert { type: "json" };
 
 // ---------------------------------------------------------------------------
 // Usage
@@ -15,7 +16,7 @@ Usage: mdr <path-to-markdown> [options]
 
 Options:
   --port <n>         Port for the local server (default: auto-select)
-  --tmp-dir <dir>    Root for annotation session storage (default: /tmp/markdown-review)
+  --tmp-dir <dir>    Root for annotation session storage (default: /tmp/markdown-review on Unix, %APPDATA%/markdown-review/tmp on Windows)
   --no-open          Don't auto-open the browser
   --lan              Expose the server on the local network and print a QR code (implies --no-open)
   --host <host>      Public LAN URL host for --lan QR codes (default: detected IPv4)
@@ -24,11 +25,13 @@ Options:
   --pi <port>        Pi integration — enable "Send to pi" callback on given port
   --cleanup <file>   Mark a reviewed file as applied: remove its annotations and session data
   --clean            Delete all session data (manifests, markers, annotations) and exit
+  -V, --version      Show version number
   -h, --help         Show this help message
 
 Configuration:
   Persistent defaults can be set in an env file at
-  $XDG_CONFIG_HOME/mdr/config.env (default ~/.config/mdr/config.env), e.g.:
+  $XDG_CONFIG_HOME/mdr/config.env (default ~/.config/mdr/config.env on Unix,
+  %APPDATA%/markdown-review/config.env on Windows), e.g.:
     MDR_LAN=1
     MDR_PORT=7000
     MDR_HOST=your-host.local
@@ -52,6 +55,7 @@ interface ParsedArgs {
   piPort?: number;
   cleanupFile?: string;
   clean: boolean;
+  version: boolean;
   help: boolean;
 }
 
@@ -69,6 +73,11 @@ const CONFIG_KEYS = [
 ] as const;
 
 export function configEnvPath(): string {
+  if (process.platform === "win32") {
+    const appData = process.env.APPDATA;
+    if (appData) return join(appData, "markdown-review", "config.env");
+    return join(homedir(), "AppData", "Roaming", "markdown-review", "config.env");
+  }
   const base = process.env.XDG_CONFIG_HOME?.trim() || join(homedir(), ".config");
   return join(base, "mdr", "config.env");
 }
@@ -161,14 +170,24 @@ export function resolveConfigDefaults(record: Record<string, string>): ConfigRes
   return { defaults, errors };
 }
 
+function getDefaultTmpDir(): string {
+  if (process.platform === "win32") {
+    const appData = process.env.APPDATA;
+    if (appData) return join(appData, "markdown-review", "tmp");
+    return join(homedir(), "AppData", "Roaming", "markdown-review", "tmp");
+  }
+  return join(tmpdir(), "markdown-review");
+}
+
 function parseArgs(argv: string[], configDefaults: Partial<ParsedArgs> = {}): ParsedArgs {
   const args: ParsedArgs = {
-    tmpDir: "/tmp/markdown-review",
+    tmpDir: getDefaultTmpDir(),
     noOpen: false,
     lan: false,
     fresh: false,
     autoDiscover: false,
     clean: false,
+    version: false,
     help: false,
     ...configDefaults,
   };
@@ -279,6 +298,12 @@ function parseArgs(argv: string[], configDefaults: Partial<ParsedArgs> = {}): Pa
 
     if (arg === "--clean") {
       args.clean = true;
+      i++;
+      continue;
+    }
+
+    if (arg === "--version" || arg === "-V") {
+      args.version = true;
       i++;
       continue;
     }
@@ -451,10 +476,14 @@ export function printLanAccess(port: number, options: PrintLanAccessOptions = {}
 async function main() {
   const rawArgs = process.argv.slice(2);
 
-  // Help needs nothing from the config file; handle it before loading so a
-  // malformed config can't prevent the user from reading the help text.
+  // Help and version need nothing from the config file; handle them before
+  // loading so a malformed config can't prevent the user from reading help.
   if (rawArgs.includes("-h") || rawArgs.includes("--help")) {
     console.log(usage);
+    process.exit(0);
+  }
+  if (rawArgs.includes("-V") || rawArgs.includes("--version")) {
+    console.log(pkg.version);
     process.exit(0);
   }
 

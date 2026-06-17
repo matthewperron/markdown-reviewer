@@ -1,10 +1,10 @@
 # markdown-reviewer (`mdr`)
 
-A browser-based markdown annotation tool. Open a `.md` file, click blocks to add comments, hit **Done**, and get a `_reviewed.md` file with inline review markers — structured feedback an LLM agent can read and act on.
+A browser-based markdown annotation tool. Open a `.md` file, click blocks to add comments, hit **Done**, and get a `.mdr` file with inline review markers — structured feedback an LLM agent can read and act on.
 
 ```
 mdr proposal.md
-→ browser opens → click blocks → add comments → Done → proposal_reviewed.md
+→ browser opens → click blocks → add comments → Done → proposal.mdr
 ```
 
 ## Usage
@@ -25,13 +25,14 @@ as `<name>.mdr`.
 - `--host <host>` — Public LAN URL host for `--lan` QR codes, useful when a DNS name points at your machine
 - `--fresh` — Discard existing session, start clean
 - `--auto-discover` — Crawl the relative-`.md` link graph from the entry file and map the whole cluster into the session up front
-- `--pi <port>` — Enable pi integration mode. Injects a "Send to pi" button in the review terminal that POSTs the review prompt to a pi callback server on the given port. Use with `--lan --no-open` for the [pi extension](#pi-integration).
+- `--pi <port>` — Enable pi integration mode. Injects a "Send to pi" button in the review terminal that POSTs the review prompt to a pi callback server on the given port. Use with `--lan --no-open` for the [pi extension](#agent-harness-integrations).
 - `--cleanup <file>` — Remove session artifacts for a single file (`.mdr` file, annotation directory, and manifest entry). Use after all annotations have been applied.
 
 ### Configuration file
 
-Set persistent defaults in an env-style file at `~/.config/mdr/config.env` (or
-`$XDG_CONFIG_HOME/mdr/config.env`) so you don't have to retype flags on every run:
+Set persistent defaults in an env-style file so you don't have to retype flags on every run:
+- **Unix:** `~/.config/mdr/config.env` (or `$XDG_CONFIG_HOME/mdr/config.env`)
+- **Windows:** `%APPDATA%/markdown-review/config.env`
 
 ```sh
 # ~/.config/mdr/config.env
@@ -47,7 +48,216 @@ flags** — so an explicit flag (e.g. `--port 8000`) always wins over the file.
 `MDR_HOST` only takes effect when LAN mode is enabled (`MDR_LAN=1` or `--lan`); set on its own it is
 ignored with a warning.
 
-## pi Integration
+## How it works
+
+1. **CLI** — `mdr file.md` starts a local Bun HTTP server and opens your browser.
+2. **Server** — Parses the markdown into annotatable blocks (headings, paragraphs, list items, code blocks, blockquotes, table cells) and serves a single-page view.
+3. **Browser** — Click any block to add or edit a comment. The sidebar shows all active and orphaned annotations.
+4. **Done** — The server regenerates all `.mdr` files and shows a terminal with the reviewed file paths. The server stays alive and shuts down after 30 minutes without a browser heartbeat.
+
+Annotations persist as JSON files and **auto-resume** on re-run. Blocks are matched by content hash (not line numbers), so annotations survive reordering and unrelated edits. `.mdr` files are regenerated after every annotation save or delete — they always reflect the current state.
+
+## Server API
+
+### Single-file (backward-compatible)
+
+| Method | Path | Response |
+|--------|------|----------|
+| `GET` | `/api/markdown` | `{ source, blocks }` |
+| `GET` | `/api/annotations` | `{ annotations }` |
+| `POST` | `/api/annotations` | `{ annotation }` (201 create / 200 update) |
+| `DELETE` | `/api/annotations/:id` | `{ ok }` or 404 |
+| `POST` | `/api/done` | `{ ok, path }` or `{ ok: false, error }` |
+
+### Multi-file
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/files` | List loaded files + active key |
+| `GET` | `/api/session-files` | Manifest-backed session file list |
+| `GET` | `/api/files/:key` | Load file on-demand |
+| `GET` | `/api/files/:key/annotations` | File-scoped annotations |
+| `POST` | `/api/files/:key/annotations` | Create/update annotation |
+| `DELETE` | `/api/files/:key/annotations/:id` | Remove annotation |
+| `GET` | `/api/reviewed-files` | Files with annotations |
+| `GET` | `/api/ping` | Heartbeat ping |
+
+### Static
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/` | Prerendered HTML page |
+| `GET` | `/app.js` | Frontend JavaScript |
+| `GET` | `/static/*` | Static assets from `public/` |
+
+## Output format
+
+Each annotated file generates a `.mdr` file alongside the original (e.g., `spec.md` → `spec.mdr`). The `.mdr` file contains:
+
+1. **AGENT PROTOCOL block** — an HTML comment at the top with authoritative instructions for an agent applying the review (triage, consistency, preservation rules, cleanup).
+2. **Summary section** — numbered annotations with block type, line range, and comment text. Orphaned annotations (blocks that were deleted) are listed separately.
+3. **Thematic break** separator.
+4. **Full original source** with inline `<!-- Review: [N] comment -->` markers spliced at each annotated block's position.
+
+The original formatting is preserved byte-for-byte — markers are inserted into the source string, never re-serialized from an AST.
+
+## Install
+
+**Prerequisite:** [Bun](https://bun.sh) (v1.0+)
+
+**macOS / Linux:**
+
+```bash
+curl -fsSL https://bun.sh/install | bash
+```
+
+**Windows (PowerShell):**
+
+```powershell
+irm https://bun.sh/install.ps1 | iex
+```
+
+**Windows (winget):**
+
+```bash
+winget install oven-sh.Bun
+```
+
+**Make sure Bun's global bin is on your `PATH`:**
+
+- **Unix:**
+  ```bash
+  echo 'export PATH="$HOME/.bun/bin:$PATH"' >> ~/.bashrc  # or ~/.zshrc
+  ```
+- **Windows (PowerShell):** Add to your profile (`notepad $PROFILE`):
+  ```powershell
+  $env:PATH += ";$env:USERPROFILE\.bun\bin"
+  ```
+  Then restart your terminal.
+
+```sh
+git clone <repo>
+cd markdown-reviewer
+bun install
+```
+
+Run against a file:
+
+```sh
+bun run start path/to/doc.md
+```
+
+Or install globally — from the project directory, run:
+
+```bash
+bun link
+```
+
+After that, `mdr` is available from anywhere:
+
+```bash
+mdr path/to/doc.md
+```
+
+`bun link` creates a symlink to your project source. Because Bun runs `.ts` files directly (no build step), code changes are picked up immediately — you only need to re-run `bun link` if `package.json` itself changes.
+
+## Run over LAN
+
+To access `mdr` from another machine on your network (e.g. a remote server), set the default port
+and enable LAN mode via the config file, then open a firewall rule.
+
+**1. Create the config file:**
+
+**Unix (macOS / Linux):**
+
+```bash
+mkdir -p ~/.config/mdr
+cat > ~/.config/mdr/config.env << 'EOF'
+MDR_LAN=1
+MDR_PORT=11111
+EOF
+```
+
+**Windows:**
+
+```powershell
+mkdir -Force "$env:APPDATA\markdown-review"
+Set-Content -Path "$env:APPDATA\markdown-review\config.env" -Value "MDR_LAN=1`nMDR_PORT=11111"
+```
+
+**2. Add a firewall rule:**
+
+**Unix (macOS / Linux — requires root):**
+
+```bash
+# Linux (ufw)
+sudo ufw allow 11111/tcp
+# macOS (pf — add to /etc/pf.anchors/mdr and load)
+sudo echo 'pass in on en0 proto tcp to port 11111' >> /etc/pf.anchors/mdr
+sudo pfctl -a mdr -f /etc/pf.anchors/mdr
+```
+
+**Windows (PowerShell — requires admin):**
+
+```powershell
+New-NetFirewallRule -DisplayName 'markdown-reviewer (mdr)' -Direction Inbound -LocalPort 11111 -Protocol TCP -Action Allow
+```
+
+**3. Run `mdr`** — it will bind to `0.0.0.0:11111` and print the LAN URL. Open it from any device on your network.
+
+## Development
+
+```sh
+bun run dev path/to/doc.md    # watch mode
+bun run typecheck             # TypeScript check
+bun test                      # run tests
+```
+
+**Optional:** install the pre-commit hook (auto-bumps patch version on each commit):
+
+```sh
+cp scripts/pre-commit.sh .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+```
+
+## Project structure
+
+```
+src/
+├── cli/
+│   └── index.ts                # CLI entry: arg parsing, server launch, signal handling, LAN/QR
+├── frontend/
+│   ├── app.js                  # vanilla JS frontend (IIFE, no build step)
+│   └── page.html               # server-rendered HTML page template
+├── review/
+│   ├── generator.ts            # review generator: AGENT PROTOCOL + summary + inline marker splicing
+│   └── generator.test.ts
+├── server/
+│   ├── index.ts                # Bun HTTP server, all API routes, static serving, heartbeat
+│   ├── index.test.ts
+│   ├── integration-routes.test.ts  # integration tests for multi-file routes
+│   ├── markdown-service.ts     # parseDocument / loadDocument (remark pipeline + link detection)
+│   ├── markdown-service.test.ts
+│   ├── anchoring.ts            # computeAnchor, relocate (four-tier matcher), serializeAnchor
+│   ├── anchoring.test.ts
+│   ├── annotation-service.ts   # JSON file persistence, session lock (PID-based), CRUD
+│   ├── annotation-service.test.ts
+│   ├── file-store.ts           # in-memory registry of loaded files (FileStore class)
+│   ├── file-crawler.ts         # cycle-safe BFS auto-discover of relative .md link graph
+│   ├── file-crawler.test.ts
+│   ├── session-manifest.ts     # session manifest CRUD, .session/.path markers, session merge
+│   ├── session-manifest.test.ts
+│   ├── manifest-mutex.ts       # async FIFO mutex to serialize manifest read-modify-write
+│   └── manifest-mutex.test.ts
+├── shared/
+│   └── types.ts                # BlockAnchor, BlockNode, Annotation, AnnotationStatus, FileKey, MdLink
+└── types/
+    └── qrcode-terminal.d.ts    # type declaration for qrcode-terminal
+```
+
+## Agent harness integrations
+
+### pi
 
 The [pi](https://github.com/earendil-works/pi-coding-agent) extension (`~/.pi/agent/extensions/mdr.ts`) provides a browser-based annotation workflow that feeds reviews directly into your pi conversation.
 
@@ -68,94 +278,3 @@ The [pi](https://github.com/earendil-works/pi-coding-agent) extension (`~/.pi/ag
 5. When all annotations are applied, pi runs `mdr --cleanup` to remove session artifacts
 
 The extension is maintained in `~/.pi/agent/extensions/mdr.ts` — not bundled in this repo.
-
-## How it works
-
-1. **CLI** — `mdr file.md` starts a local Bun HTTP server and opens your browser.
-2. **Server** — Parses the markdown into annotatable blocks (headings, paragraphs, list items, code blocks, blockquotes, table cells) and serves a single-page view.
-3. **Browser** — Click any block to add or edit a comment. The sidebar shows all active and orphaned annotations.
-4. **Done** — The server generates `file_reviewed.md` alongside the original, confirms success to the browser, then shuts down.
-
-Annotations persist as JSON files and **auto-resume** on re-run. Blocks are matched by content hash (not line numbers), so annotations survive reordering and unrelated edits.
-
-## Server API
-
-| Method | Path | Response |
-|--------|------|----------|
-| `GET` | `/api/markdown` | `{ source, blocks }` |
-| `GET` | `/api/annotations` | `{ annotations }` |
-| `POST` | `/api/annotations` | `{ annotation }` (201 create / 200 update) |
-| `DELETE` | `/api/annotations/:id` | `{ ok }` or 404 |
-| `POST` | `/api/done` | `{ ok, path }` or `{ ok: false, error }` |
-
-## Output format
-
-The `_reviewed.md` file contains:
-
-1. **Summary section** — numbered annotations with block type, line range, and comment text. Orphaned annotations (blocks that were deleted) are listed separately.
-2. **Thematic break** separator.
-3. **Full original source** with inline `<!-- Review: [N] comment -->` markers spliced at each annotated block's position.
-
-The original formatting is preserved byte-for-byte — markers are inserted into the source string, never re-serialized from an AST.
-
-## Install
-
-```sh
-git clone <repo>
-cd markdown-reviewer
-bun install
-```
-
-Run against a file:
-
-```sh
-bun run start path/to/doc.md
-```
-
-Or install globally. `bun install -g .` is [broken](https://github.com/oven-sh/bun/issues) — use one of these instead:
-
-**Option 1:** `bun link` (re-run after code changes to update the binary)
-
-```sh
-bun link
-mdr path/to/doc.md
-```
-
-**Option 2:** `bun install -g` with an absolute path
-
-```sh
-bun install -g /path/to/markdown-reviewer
-mdr path/to/doc.md
-```
-
-## Development
-
-```sh
-bun run dev path/to/doc.md    # watch mode
-bun run typecheck             # TypeScript check
-bun test                      # run tests
-```
-
-## Project structure
-
-```
-src/
-├── cli/index.ts                # CLI entry point
-├── frontend/
-│   ├── app.js                  # Frontend (vanilla JS, no build step)
-│   └── page.html               # HTML page template
-├── review/
-│   ├── generator.ts            # Review file generator
-│   └── generator.test.ts
-├── server/
-│   ├── index.ts                # HTTP server + API routes
-│   ├── index.test.ts
-│   ├── markdown-service.ts     # Markdown parsing (remark pipeline)
-│   ├── markdown-service.test.ts
-│   ├── anchoring.ts            # Block anchoring + relocation
-│   ├── anchoring.test.ts
-│   ├── annotation-service.ts   # JSON persistence + session lock
-│   └── annotation-service.test.ts
-└── shared/
-    └── types.ts                # Shared TypeScript types
-```
