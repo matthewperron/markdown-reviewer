@@ -192,9 +192,50 @@
       copyText(prompt, elTerminalCopyPrompt, 'Copy prompt', 'Prompt copied');
     };
 
+    // "Send to pi" button — only shown when launched from pi (--pi flag)
+    var existingSendBtn = document.getElementById('terminal-send-pi');
+    if (existingSendBtn) existingSendBtn.remove();
+
+    if (window.__MDR_PI_PORT) {
+      var elTerminalActions = document.getElementById('terminal-actions');
+      var sendBtn = document.createElement('button');
+      sendBtn.id = 'terminal-send-pi';
+      sendBtn.className = 'toolbar-btn toolbar-btn--primary';
+      sendBtn.textContent = 'Send to pi';
+      sendBtn.onclick = function () {
+        sendToPi(prompt, sendBtn);
+      };
+      elTerminalActions.insertBefore(sendBtn, elTerminalDismiss);
+    }
+
     elTerminal.classList.remove('terminal--error');
     elTerminalError.classList.remove('visible');
     showTerminal();
+  }
+
+  async function sendToPi(promptText, button) {
+    button.disabled = true;
+    button.textContent = 'Sending…';
+    try {
+      var res = await fetch('http://localhost:' + window.__MDR_PI_PORT + '/api/mdr/review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: promptText }),
+      });
+      if (res.ok) {
+        button.textContent = 'Sent ✓';
+        setStatus('sent to pi', 'ok');
+      } else {
+        var errData = await res.json().catch(function () { return {}; });
+        button.textContent = 'Send failed';
+        setStatus('send to pi failed: ' + (errData.error || res.statusText), 'error');
+      }
+    } catch (err) {
+      button.textContent = 'Send failed';
+      setStatus('send to pi failed: ' + err.message, 'error');
+    } finally {
+      // Keep button disabled after send (success or failure) to prevent double-sends
+    }
   }
 
   function copyText(text, button, defaultLabel, copiedLabel) {

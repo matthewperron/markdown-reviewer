@@ -56,6 +56,7 @@ export interface ServerOptions {
   autoDiscover?: boolean; // crawl relative-.md link graph into session
   lan?: boolean;          // bind to all interfaces for opt-in LAN access
   allowedHosts?: string[]; // optional Host header allow-list for LAN exposure
+  piPort?: number;        // pi callback port — injected into page for "Send to pi" button
   /** Override heartbeat timeout (ms). Default 30 minutes. For testing only. */
   heartbeatTimeout?: number;
   /** Override heartbeat check interval (ms). Default 5000. For testing only. */
@@ -215,7 +216,7 @@ async function handleDeleteAnnotation(entry: FileEntry, id: string): Promise<Res
 // ---------------------------------------------------------------------------
 
 export async function startServer(opts: ServerOptions): Promise<RunningServer> {
-  const { filePath, port = 0, tmpDir, fresh, autoDiscover, lan = false, allowedHosts, heartbeatTimeout, heartbeatInterval, graceTimeout } = opts;
+  const { filePath, port = 0, tmpDir, fresh, autoDiscover, lan = false, allowedHosts, piPort, heartbeatTimeout, heartbeatInterval, graceTimeout } = opts;
 
   // Resolve entry file to absolute path
   const entryFilePathRaw = resolvePath(filePath);
@@ -315,10 +316,18 @@ export async function startServer(opts: ServerOptions): Promise<RunningServer> {
 
   // Inject full-document HTML and file name
   const fileName = entryFileEntry.fileName;
-  const renderedPage = pageHtml
+  let renderedPage = pageHtml
     .replace("<!--BLOCKS-->", fullHtml)
     .replace("<!--FILE_NAME-->", fileName)
     .replace("<!--FILE_KEY-->", entryKey);
+
+  // Inject pi callback port for "Send to pi" integration
+  if (piPort != null) {
+    renderedPage = renderedPage.replace(
+      "</head>",
+      `<script>window.__MDR_PI_PORT=${piPort}</script>\n</head>`
+    );
+  }
 
   // Pre-gzip the two large, static text responses once at startup. The page
   // and app.js never change for the life of the server, so there is no reason

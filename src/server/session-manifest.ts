@@ -342,3 +342,48 @@ export async function mergeSessions(
 
   return survivor;
 }
+
+/**
+ * Clean up session data for a single file after its review has been applied.
+ *
+ * Removes:
+ * - The .mdr reviewed output file
+ * - The annotation directory (annotations, lock, markers)
+ * - The file entry from the session manifest
+ * - The manifest itself if it becomes empty
+ *
+ * Idempotent: safe to call even if the file has no session data.
+ */
+export async function cleanupFile(
+  filePath: string,
+  tmpDir: string
+): Promise<void> {
+  // Read session marker BEFORE deleting the annotation directory
+  const sessionId = await readSessionMarker(filePath, tmpDir).catch(() => null);
+
+  // Delete the .mdr output file
+  const mdrPath = filePath.replace(/\.md$/i, ".mdr");
+  await rm(mdrPath, { force: true });
+
+  // Delete annotation directory (annotations, lock, markers)
+  const sessDir = sessionDir(filePath, tmpDir);
+  await rm(sessDir, { recursive: true, force: true });
+
+  // If no session was tracked, we're done
+  if (!sessionId) return;
+
+  // Try to load the manifest (may have been deleted)
+  const manifest = await loadManifestDirect(sessionId, tmpDir).catch(() => null);
+  if (!manifest) return;
+
+  // Remove the file from the manifest
+  manifest.files = manifest.files.filter((f) => f.filePath !== filePath);
+  manifest.updatedAt = Date.now();
+
+  if (manifest.files.length === 0) {
+    // Empty manifest — delete it
+    await rm(manifestPathDirect(tmpDir, sessionId), { force: true });
+  } else {
+    await saveSessionManifest(manifest, tmpDir);
+  }
+}

@@ -113,6 +113,8 @@ src/
 | `--host <host>` | detected IPv4 | Public LAN URL host for `--lan` QR codes (requires `--lan`) |
 | `--fresh` | false | Discard existing session, start clean |
 | `--auto-discover` | false | Eagerly crawl the relative-`.md` link graph and add reachable files to session |
+| `--pi <port>` | — | Pi integration — enable "Send to pi" callback on given port |
+| `--cleanup <file>` | — | Mark reviewed file as applied: remove .mdr, annotations, and session data |
 | `--clean` | false | Delete all session data (manifests, markers, annotations) and exit |
 | `-h, --help` | — | Show help |
 

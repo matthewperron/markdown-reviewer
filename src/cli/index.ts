@@ -4,6 +4,7 @@ import { access, constants, rm } from "node:fs/promises";
 import { networkInterfaces, homedir } from "node:os";
 import qrcode from "qrcode-terminal";
 import { startServer, SessionLockedError } from "../server/index";
+import { cleanupFile } from "../server/session-manifest";
 
 // ---------------------------------------------------------------------------
 // Usage
@@ -20,6 +21,8 @@ Options:
   --host <host>      Public LAN URL host for --lan QR codes (default: detected IPv4)
   --fresh            Discard existing session, start clean
   --auto-discover    Crawl the relative-.md link graph and add reachable files to session
+  --pi <port>        Pi integration — enable "Send to pi" callback on given port
+  --cleanup <file>   Mark a reviewed file as applied: remove its annotations and session data
   --clean            Delete all session data (manifests, markers, annotations) and exit
   -h, --help         Show this help message
 
@@ -46,6 +49,8 @@ interface ParsedArgs {
   host?: string;
   fresh: boolean;
   autoDiscover: boolean;
+  piPort?: number;
+  cleanupFile?: string;
   clean: boolean;
   help: boolean;
 }
@@ -245,6 +250,33 @@ function parseArgs(argv: string[], configDefaults: Partial<ParsedArgs> = {}): Pa
       continue;
     }
 
+    if (arg === "--pi") {
+      const val = argv[++i];
+      if (val === undefined) {
+        console.error("Error: --pi requires a value");
+        process.exit(1);
+      }
+      const port = parsePortValue(val);
+      if (port === null) {
+        console.error(`Error: --pi value must be a number between 0 and 65535, got "${val}"`);
+        process.exit(1);
+      }
+      args.piPort = port;
+      i++;
+      continue;
+    }
+
+    if (arg === "--cleanup") {
+      const val = argv[++i];
+      if (val === undefined) {
+        console.error("Error: --cleanup requires a value");
+        process.exit(1);
+      }
+      args.cleanupFile = val;
+      i++;
+      continue;
+    }
+
     if (arg === "--clean") {
       args.clean = true;
       i++;
@@ -431,6 +463,19 @@ async function main() {
   );
   const args = parseArgs(rawArgs, configDefaults);
 
+  // --cleanup <file>: remove session data for a single reviewed file
+  if (args.cleanupFile) {
+    try {
+      const cleanupPath = resolve(args.cleanupFile);
+      await cleanupFile(cleanupPath, args.tmpDir);
+      console.log(`Cleanup done: ${cleanupPath}`);
+      process.exit(0);
+    } catch (err: any) {
+      console.error(`Error cleaning up session: ${err.message}`);
+      process.exit(1);
+    }
+  }
+
   // --clean: delete all session data and exit. It only needs tmpDir, so it runs
   // before surfacing config-value errors (a bad MDR_PORT shouldn't block a clean).
   if (args.clean) {
@@ -496,6 +541,7 @@ async function main() {
       autoDiscover: args.autoDiscover,
       lan: args.lan,
       allowedHosts: lanHost ? [lanHost] : undefined,
+      piPort: args.piPort,
     });
   } catch (err) {
     if (err instanceof SessionLockedError) {

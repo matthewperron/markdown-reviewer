@@ -2,6 +2,7 @@ import { describe, test, expect, beforeEach, afterEach } from "bun:test";
 import { mkdir, writeFile, rm, readdir, readFile, access } from "node:fs/promises";
 import { join } from "node:path";
 import {
+  cleanupFile,
   loadOrCreateSessionManifest,
   saveSessionManifest,
   loadManifestDirect,
@@ -594,5 +595,83 @@ describe("saveSessionManifest", () => {
     const path = manifestPathDirect(tmpDir, manifest.id);
     const exists = await access(path).then(() => true).catch(() => false);
     expect(exists).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// cleanupFile
+// ---------------------------------------------------------------------------
+
+describe("cleanupFile", () => {
+  test("removes .mdr file, annotation directory, and manifest entry", async () => {
+    const filePath = createTestFile("doc.md");
+    const mdrPath = filePath.replace(/\.md$/, ".mdr");
+
+    // Create a session with the file
+    const manifest = await loadOrCreateSessionManifest(filePath, tmpDir);
+    const sessionId = manifest.id;
+
+    // Create a .mdr output file
+    await writeFile(mdrPath, "# Review of doc.md");
+    const mdrExistsBefore = await access(mdrPath).then(() => true).catch(() => false);
+    expect(mdrExistsBefore).toBe(true);
+
+    // Create some annotation files in the session dir
+    const sessDir = sessionDir(filePath, tmpDir);
+    await writeFile(join(sessDir, "abc123.json"), JSON.stringify({ id: "abc123" }));
+
+    // Cleanup
+    await cleanupFile(filePath, tmpDir);
+
+    // .mdr file should be gone
+    const mdrExistsAfter = await access(mdrPath).then(() => true).catch(() => false);
+    expect(mdrExistsAfter).toBe(false);
+
+    // Annotation directory should be gone
+    const dirExists = await access(sessDir).then(() => true).catch(() => false);
+    expect(dirExists).toBe(false);
+
+    // Manifest should be deleted (was the only file)
+    const manifestAfter = await loadManifestDirect(sessionId, tmpDir);
+    expect(manifestAfter).toBeNull();
+  });
+
+  test("keeps manifest when other files remain after cleanup", async () => {
+    const fileA = createTestFile("a.md");
+    const fileB = createTestFile("b.md");
+
+    // Create session with file A
+    const manifestA = await loadOrCreateSessionManifest(fileA, tmpDir);
+    // Add file B to the same session
+    const manifestWithBoth = await addFileToSessionManifest(manifestA, fileB, tmpDir);
+    // Write session markers for B so it's tracked
+    await writeSessionMarkers(fileB, tmpDir, manifestWithBoth.id);
+
+    expect(manifestWithBoth.files).toHaveLength(2);
+
+    // Create .mdr for file A
+    const mdrA = fileA.replace(/\.md$/, ".mdr");
+    await writeFile(mdrA, "# Review of a.md");
+
+    // Cleanup only file A
+    await cleanupFile(fileA, tmpDir);
+
+    // .mdr should be gone
+    const mdrExists = await access(mdrA).then(() => true).catch(() => false);
+    expect(mdrExists).toBe(false);
+
+    // Manifest should still exist with only file B
+    const manifestAfter = await loadManifestDirect(manifestWithBoth.id, tmpDir);
+    expect(manifestAfter).not.toBeNull();
+    expect(manifestAfter!.files).toHaveLength(1);
+    expect(manifestAfter!.files[0].filePath).toBe(fileB);
+  });
+
+  test("is idempotent — safe to call when no session or .mdr exists", async () => {
+    const filePath = createTestFile("nope.md");
+
+    // Should not throw even though there's no session data or .mdr
+    await expect(cleanupFile(filePath, tmpDir)).resolves.toBeUndefined();
+    await expect(cleanupFile(filePath, tmpDir)).resolves.toBeUndefined();
   });
 });

@@ -178,7 +178,10 @@ that spans multiple lines.
   comment changes them.
   REPORT per file at the end: what changed, what was propagated cross-file, what's
   still unresolved.
-  CLEANUP per file: once you have applied a file's review to its source AND reported it AND it has no unresolved ASK items, delete that file's \`.mdr\` — it is a consumed artifact, not a doc to keep. Never delete a \`.mdr\` before its source edits are written, never delete one that still has open questions, and never delete the source file.
+  CLEANUP per file: ONLY when ALL annotations for a file have been applied (zero ASK items remaining):
+    1. Run \`mdr --cleanup <source-path>\` — this removes the .mdr file, session data, and manifest entry in one step
+    If even a single annotation is unresolved (ASK), do NOT clean up — keep the .mdr so the user can continue editing.
+    Never clean up before source edits are written, and never delete the source file.
   ========================================================================================= -->
 
 # Review of proposal.md
