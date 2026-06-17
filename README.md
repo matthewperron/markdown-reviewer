@@ -25,7 +25,7 @@ as `<name>.mdr`.
 - `--host <host>` — Public LAN URL host for `--lan` QR codes, useful when a DNS name points at your machine
 - `--fresh` — Discard existing session, start clean
 - `--auto-discover` — Crawl the relative-`.md` link graph from the entry file and map the whole cluster into the session up front
-- `--pi <port>` — Enable pi integration mode. Injects a "Send to pi" button in the review terminal that POSTs the review prompt to a pi callback server on the given port. Use with `--lan --no-open` for the [pi extension](#pi-integration).
+- `--pi <port>` — Enable pi integration mode. Injects a "Send to pi" button in the review terminal that POSTs the review prompt to a pi callback server on the given port. Use with `--lan --no-open` for the [pi extension](#agent-harness-integrations).
 - `--cleanup <file>` — Remove session artifacts for a single file (`.mdr` file, annotation directory, and manifest entry). Use after all annotations have been applied.
 
 ### Configuration file
@@ -47,28 +47,6 @@ flags** — so an explicit flag (e.g. `--port 8000`) always wins over the file.
 
 `MDR_HOST` only takes effect when LAN mode is enabled (`MDR_LAN=1` or `--lan`); set on its own it is
 ignored with a warning.
-
-## pi Integration
-
-The [pi](https://github.com/earendil-works/pi-coding-agent) extension (`~/.pi/agent/extensions/mdr.ts`) provides a browser-based annotation workflow that feeds reviews directly into your pi conversation.
-
-**Commands:**
-
-| Command | Action |
-|---------|--------|
-| `/mdr file.md` | Start a review session — opens your browser on the LAN URL |
-| `/mdr kill` | Stop the current review (kills mdr + callback server) |
-| `/mdr clean` | Delete all session data |
-
-**Workflow:**
-
-1. Run `/mdr path/to/file.md` in pi
-2. Annotate blocks in your browser
-3. Click **Done**, then **Send to pi** — the review prompt is injected into your conversation
-4. Ask pi to apply the review — it reads the `.mdr` file and edits your source
-5. When all annotations are applied, pi runs `mdr --cleanup` to remove session artifacts
-
-The extension is maintained in `~/.pi/agent/extensions/mdr.ts` — not bundled in this repo.
 
 ## How it works
 
@@ -168,3 +146,27 @@ src/
 └── shared/
     └── types.ts                # Shared TypeScript types
 ```
+
+## Agent harness integrations
+
+### pi
+
+The [pi](https://github.com/earendil-works/pi-coding-agent) extension (`~/.pi/agent/extensions/mdr.ts`) provides a browser-based annotation workflow that feeds reviews directly into your pi conversation.
+
+**Commands:**
+
+| Command | Action |
+|---------|--------|
+| `/mdr file.md` | Start a review session — opens your browser on the LAN URL |
+| `/mdr kill` | Stop the current review (kills mdr + callback server) |
+| `/mdr clean` | Delete all session data |
+
+**Workflow:**
+
+1. Run `/mdr path/to/file.md` in pi
+2. Annotate blocks in your browser
+3. Click **Done**, then **Send to pi** — the review prompt is injected into your conversation
+4. Ask pi to apply the review — it reads the `.mdr` file and edits your source
+5. When all annotations are applied, pi runs `mdr --cleanup` to remove session artifacts
+
+The extension is maintained in `~/.pi/agent/extensions/mdr.ts` — not bundled in this repo.
