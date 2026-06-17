@@ -23,8 +23,7 @@ let fileDir: string;
 
 async function createTestFile(name: string, content = "# Test"): Promise<string> {
   const path = join(fileDir, name);
-  // We create the file synchronously for test setup
-  Bun.write(path, content);
+  await writeFile(path, content, "utf-8");
   // Return realpath-normalized path so cleanupFile (which uses realpath internally)
   // can find the session marker written during loadOrCreateSessionManifest
   return realpath(path);
