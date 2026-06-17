@@ -102,7 +102,10 @@ winget install oven-sh.Bun
 
 **Make sure Bun's global bin is on your `PATH`:**
 
-- **Unix:** `echo 'export PATH="$HOME/.bun/bin:$PATH"' >> ~/.bashrc` (or `~/.zshrc`)
+- **Unix:**
+  ```bash
+  echo 'export PATH="$HOME/.bun/bin:$PATH"' >> ~/.bashrc  # or ~/.zshrc
+  ```
 - **Windows (PowerShell):** Add to your profile (`notepad $PROFILE`):
   ```powershell
   $env:PATH += ";$env:USERPROFILE\.bun\bin"
