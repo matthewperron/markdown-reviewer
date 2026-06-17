@@ -238,9 +238,12 @@ code
 });
 
 describe("loadDocument", () => {
+  const tmpFile = join(tmpdir(), "test-md-load.md");
+  // Create the test file eagerly so all tests can read it
+  Bun.write(tmpFile, "# Hello\n\nWorld");
+
   test("reads file and returns fileHash + fullHtml", async () => {
-    const tmpFile = Bun.write("/tmp/test-md-load.md", "# Hello\n\nWorld");
-    const result = await loadDocument("/tmp/test-md-load.md");
+    const result = await loadDocument(tmpFile);
     expect(result.source).toBe("# Hello\n\nWorld");
     expect(result.fileHash.length).toBe(64); // SHA-256 hex
     expect(result.blocks.length).toBeGreaterThan(0);
@@ -248,13 +251,13 @@ describe("loadDocument", () => {
   });
 
   test("fileHash is stable for same content", async () => {
-    const result1 = await loadDocument("/tmp/test-md-load.md");
-    const result2 = await loadDocument("/tmp/test-md-load.md");
+    const result1 = await loadDocument(tmpFile);
+    const result2 = await loadDocument(tmpFile);
     expect(result1.fileHash).toBe(result2.fileHash);
   });
 
   test("returns links: [] when no opts provided", async () => {
-    const result = await loadDocument("/tmp/test-md-load.md");
+    const result = await loadDocument(tmpFile);
     expect(result.links).toEqual([]);
   });
 });

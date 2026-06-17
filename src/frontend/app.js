@@ -70,6 +70,8 @@
   var fileState = {};       // key -> { key, fileName, fullHtml, blocks, annotations, annotationCount }
   var discoveringTimeout = null; // debounce for auto-discover polling
   var prevFileZoneCount = 0;  // tracks file list size to detect additions
+  // Note: FileKey is always forward-slash normalized on the server side
+  // (even on Windows where path.relative() returns backslashes).
 
   // -----------------------------------------------------------------------
   // Helpers

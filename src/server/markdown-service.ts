@@ -174,7 +174,7 @@ async function resolveLink(
     if (!s.isFile()) return null;
     // Normalize session root with realpath too (handles /tmp → /private/tmp etc.)
     const normalizedRoot = await realpath(sessionRoot);
-    const resolvedKey = relative(normalizedRoot, resolvedPath);
+    const resolvedKey = relative(normalizedRoot, resolvedPath).replace(/\\/g, "/");
     return { originalUrl: url, resolvedKey, resolvedPath };
   } catch {
     return null;

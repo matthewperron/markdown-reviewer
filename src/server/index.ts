@@ -293,7 +293,7 @@ export async function startServer(opts: ServerOptions): Promise<RunningServer> {
   });
 
   // Create FileStore with entry file
-  const entryKey = relative(sessionRoot, entryFilePath) as FileKey;
+  const entryKey = relative(sessionRoot, entryFilePath).replace(/\\/g, "/") as FileKey;
   const fileStore = new FileStore(sessionRoot, entryKey);
 
   const entryFileEntry: FileEntry = {
@@ -398,8 +398,9 @@ export async function startServer(opts: ServerOptions): Promise<RunningServer> {
         const publicDir = join(import.meta.dir, "..", "..", "public");
         const assetPath = join(publicDir, relPath);
         // Containment: ensure resolved path is inside public/
-        // C8: trailing path.sep guard prevents prefix-match on siblings like public-x/
-        if (!assetPath.startsWith(publicDir + "/")) {
+        // Use path.relative() for cross-platform safety (works with backslashes on Windows)
+        const relAsset = relative(publicDir, assetPath);
+        if (relAsset.startsWith("..") || relAsset === "") {
           return json({ ok: false, error: `Not found: ${pathname}` }, 404);
         }
         try {
@@ -432,7 +433,7 @@ export async function startServer(opts: ServerOptions): Promise<RunningServer> {
       if (pathname === "/api/session-files" && req.method === "GET") {
         const sessionFiles = await discoverSessionFiles(currentManifest, tmpDir);
         const files = sessionFiles.map((sf) => ({
-          key: relative(sessionRoot, sf.filePath) as FileKey,
+          key: relative(sessionRoot, sf.filePath).replace(/\\/g, "/") as FileKey,
           fileName: pathBasename(sf.filePath),
           annotationCount: sf.annotationCount,
           isEntry: sf.isEntry,
@@ -709,7 +710,7 @@ export async function startServer(opts: ServerOptions): Promise<RunningServer> {
         for (const sf of sessionFiles) {
           if (sf.annotationCount > 0) {
             reviewedFiles.push({
-              key: relative(sessionRoot, sf.filePath) as FileKey,
+              key: relative(sessionRoot, sf.filePath).replace(/\\/g, "/") as FileKey,
               reviewedPath: sf.filePath.replace(/\.md$/i, ".mdr"),
               sourcePath: sf.filePath,
               annotationCount: sf.annotationCount,

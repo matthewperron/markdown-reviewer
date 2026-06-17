@@ -69,7 +69,7 @@ export function sessionDir(filePath: string, tmpDir: string): string {
     h = Math.imul(h, 0x01000193);
   }
   const pathHash = (h >>> 0).toString(16).padStart(8, "0");
-  const baseName = filePath.split("/").pop() ?? "unknown";
+  const baseName = pathBasename(filePath) ?? "unknown";
   return join(tmpDir, "annotations", `${baseName}-${pathHash}`);
 }
 
